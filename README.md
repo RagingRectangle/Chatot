@@ -56,3 +56,7 @@ Poracle:
 - Start the bot in a console with `node chatot.js`
 - Can (*should*) use PM2 to run instead with `pm2 start chatot.js`
 - All commands should be done in DMs with the bot.
+
+
+
+![Adding Pokemon](https://i.imgur.com/K4LtGPo.gif)

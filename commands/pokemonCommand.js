@@ -108,16 +108,6 @@ module.exports = {
 			}))
 
 		.addIntegerOption(option =>
-			option.setName('min_weight')
-			.setDescription(`Minimum weight`)
-			.setMinValue(0))
-
-		.addIntegerOption(option =>
-			option.setName('max_weight')
-			.setDescription(`Maximum weight`)
-			.setMinValue(1))
-
-		.addIntegerOption(option =>
 			option.setName('distance')
 			.setDescription(`Distance away in meters`)
 			.setMinValue(0)

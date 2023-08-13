@@ -203,8 +203,20 @@ client.on('interactionCreate', async interaction => {
       //Templates
       else if (optionName == 'template') {
          let templateType = interaction.commandName.replace(config.pokemonCommand, 'monster').replace(config.raidCommand, 'raid').replace(config.incidentCommand, 'invasion').replace(config.questCommand, 'quest').replace(config.lureCommand, 'lure');
+         let allTemplates = templateList[templateType];
+         var availableTemplates = [];
+         for (var a in allTemplates){
+            if (!config.ignoreTemplates.includes(allTemplates[a])){
+               availableTemplates.push(allTemplates[a]);
+            }
+         }
+
+
+         console.log(availableTemplates)
+
+
          try {
-            let filteredList = templateList[templateType].filter(choice => choice.includes(focusedValue)).slice(0, 25);
+            let filteredList = availableTemplates.filter(choice => choice.includes(focusedValue)).slice(0, 25);
             if (filteredList.length > 0) {
                sendAutoResponse(filteredList);
             }

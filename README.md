@@ -13,7 +13,7 @@ Join the Discord server for any help and to keep up with updates: https://discor
   - Lures
   - Quests
   - Raids (Specfic forms currently don't work with api)
-- Add areas
+- Add/remove areas
 - View area outlines
 - Set location
 - Change profile

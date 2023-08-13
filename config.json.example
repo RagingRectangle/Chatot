@@ -1,0 +1,31 @@
+{
+   "token": "",
+   "poracle": {
+      "secret": "",
+      "host": "",
+      "port": 3030,
+      "database": {
+         "host": "",
+         "port": 3306,
+         "user": "",
+         "password": "",
+         "database": "poracle"
+      }
+   },
+   "ignoreTemplates": [""],
+   "pokemonCommand": "track",
+   "areaCommand": "area",
+   "locationCommand": "location",
+   "profileCommand": "profile",
+   "raidCommand": "raid",
+   "incidentCommand": "incident",
+   "questCommand": "quest",
+   "lureCommand": "lure",
+   "removeCommand": "remove",
+   "pvpFilterMaxRank": "Will be autofilled with api",
+   "pvpFilterGreatMinCP": "Will be autofilled with api",
+   "pvpFilterUltraMinCP": "Will be autofilled with api",
+   "pvpFilterLittleMinCP": "Will be autofilled with api",
+   "maxDistance": "Will be autofilled with api",
+   "defaultTemplateName": "Will be autofilled with api"
+}

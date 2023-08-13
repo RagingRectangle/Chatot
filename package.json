@@ -1,0 +1,22 @@
+{
+  "name": "chatot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "chatot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "RagingRectangle",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/rest": "1.1.0",
+    "discord-api-types": "0.36.2",
+    "discord.js": "14.11.0",
+    "fs": "0.0.1-security",
+    "lodash": "^4.17.21",
+    "lodash.chunk": "^4.2.0",
+    "mysql2": "^3.4.3",
+    "request": "^2.88.2",
+    "superagent": "^8.0.9"
+  }
+}

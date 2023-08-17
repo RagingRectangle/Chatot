@@ -1,4 +1,4 @@
-# Chatot Bot
+# Chatot
 
 ## About
 A Discord bot for adding slash commands to PoracleJS.
@@ -58,5 +58,11 @@ Poracle:
 - All commands should be done in DMs with the bot.
 
 
+Adding Pokemon:
 
-![Adding Pokemon](https://i.imgur.com/K4LtGPo.gif)
+![AddingPokemon](https://i.imgur.com/K4LtGPo.gif)
+
+
+Removing Pokemon:
+
+![RemovingPokemon](https://i.imgur.com/69r08Hr.gif)

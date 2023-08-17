@@ -104,7 +104,7 @@ module.exports = {
             }
 
 
-            //No changes needed: distance, min_iv, max_iv, min_cp, max_cp, min_level, max_level, max_atk, max_def, max_sta, min_weight, max_weight, min_time
+            //No changes needed: distance, min_iv, max_iv, min_cp, max_cp, min_level, max_level, max_atk, max_def, max_sta, min_time
             filters[customFilters[c]['name']] = customFilters[c]['value'] * 1;
          } //End of c loop
          //console.log(filters);

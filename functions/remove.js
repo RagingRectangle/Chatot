@@ -37,8 +37,8 @@ module.exports = {
 
 
    autoComplete: async function autoComplete(client, interaction, config, util, questList) {
-      let focusedValue = interaction.options.getFocused();
-      let apiName = interaction.options._hoistedOptions[0]['value'].replace('incident', 'invasion');
+      let focusedValue = await interaction.options.getFocused();
+      let apiName = await interaction.options._hoistedOptions[0]['value'].replace('incident', 'invasion');
       superagent
          .get(`http://${config.poracle.host}:${config.poracle.port}/api/tracking/${apiName}/${interaction.user.id}`)
          .set('X-Poracle-Secret', config.poracle.secret)

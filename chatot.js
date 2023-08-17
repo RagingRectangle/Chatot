@@ -169,7 +169,7 @@ client.on('interactionCreate', async interaction => {
 //AutoComplete
 client.on('interactionCreate', async interaction => {
    if (!interaction.isAutocomplete()) return;
-   let focusedValue = interaction.options.getFocused();
+   let focusedValue = await interaction.options.getFocused();
    for (var i in interaction.options._hoistedOptions) {
       if (!interaction.options._hoistedOptions[i]['focused'] == true) {
          continue;
@@ -203,8 +203,15 @@ client.on('interactionCreate', async interaction => {
       //Templates
       else if (optionName == 'template') {
          let templateType = interaction.commandName.replace(config.pokemonCommand, 'monster').replace(config.raidCommand, 'raid').replace(config.incidentCommand, 'invasion').replace(config.questCommand, 'quest').replace(config.lureCommand, 'lure');
+         let allTemplates = templateList[templateType];
+         var availableTemplates = [];
+         for (var a in allTemplates){
+            if (!config.ignoreTemplates.includes(allTemplates[a])){
+               availableTemplates.push(allTemplates[a]);
+            }
+         }
          try {
-            let filteredList = templateList[templateType].filter(choice => choice.includes(focusedValue)).slice(0, 25);
+            let filteredList = availableTemplates.filter(choice => choice.includes(focusedValue)).slice(0, 25);
             if (filteredList.length > 0) {
                sendAutoResponse(filteredList);
             }
@@ -433,7 +440,7 @@ async function createIncidentList() {
 
 async function updateConfigRegisterCommands(client, config) {
    superagent
-      .get(`http://65.109.92.130:3307/api/config/poracleWeb`)
+      .get(`http://${config.poracle.host}:${config.poracle.port}/api/config/poracleWeb`)
       .set('X-Poracle-Secret', config.poracle.secret)
       .set('accept', 'application/json')
       .end((error, response) => {

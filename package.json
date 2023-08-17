@@ -16,6 +16,8 @@
     "lodash": "^4.17.21",
     "lodash.chunk": "^4.2.0",
     "mysql2": "^3.4.3",
+    "node-cache": "^5.1.2",
+    "node-fetch": "^2.6.12",
     "request": "^2.88.2",
     "superagent": "^8.0.9"
   }

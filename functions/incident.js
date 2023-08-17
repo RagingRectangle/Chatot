@@ -41,7 +41,7 @@ module.exports = {
                filters.template = customFilters[f]['value'].replace(' (Default)', '');
             }
          } //End of f loop
-         console.log(filters);
+         //console.log(filters);
          superagent
             .post(util.api.addIncident.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
             .send([filters])

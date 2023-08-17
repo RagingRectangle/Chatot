@@ -169,7 +169,7 @@ client.on('interactionCreate', async interaction => {
 //AutoComplete
 client.on('interactionCreate', async interaction => {
    if (!interaction.isAutocomplete()) return;
-   let focusedValue = interaction.options.getFocused();
+   let focusedValue = await interaction.options.getFocused();
    for (var i in interaction.options._hoistedOptions) {
       if (!interaction.options._hoistedOptions[i]['focused'] == true) {
          continue;
@@ -210,11 +210,6 @@ client.on('interactionCreate', async interaction => {
                availableTemplates.push(allTemplates[a]);
             }
          }
-
-
-         console.log(availableTemplates)
-
-
          try {
             let filteredList = availableTemplates.filter(choice => choice.includes(focusedValue)).slice(0, 25);
             if (filteredList.length > 0) {

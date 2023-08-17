@@ -440,7 +440,7 @@ async function createIncidentList() {
 
 async function updateConfigRegisterCommands(client, config) {
    superagent
-      .get(`http://65.109.92.130:3307/api/config/poracleWeb`)
+      .get(`http://${config.poracle.host}:${config.poracle.port}/api/config/poracleWeb`)
       .set('X-Poracle-Secret', config.poracle.secret)
       .set('accept', 'application/json')
       .end((error, response) => {

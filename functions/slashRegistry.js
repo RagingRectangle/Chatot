@@ -43,7 +43,7 @@ module.exports = {
             Routes.applicationCommands(client.user.id), {
                body: commands
             },
-         ).then(() => console.log(`Registered Chatot commands.`))
+         ).then(() => console.log(`Registered Chatot commands`))
          .catch(console.error);;
 
       client.commands = new Collection();

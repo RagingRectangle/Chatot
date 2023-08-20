@@ -18,6 +18,7 @@ const client = new Client({
    partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
 const fs = require('fs');
+const fetch = require('node-fetch');
 const request = require('request');
 const superagent = require('superagent');
 var config = require('./config.json');
@@ -32,6 +33,7 @@ const Lure = require('./functions/lure.js');
 const Remove = require('./functions/remove.js');
 var util = require('./util.json');
 var pokemonList = [];
+var pokemonLists = {};
 var templateList = {};
 var incidentList = {};
 var questList = {};
@@ -48,12 +50,7 @@ client.on('ready', async () => {
       };
       if (!error && res.statusCode == 200) {
          master = body;
-         //Update lists
-         createPokemonList();
-         createTemplateList();
-         createIncidentList();
-         createQuestList();
-         updateConfigRegisterCommands(client, config);
+         getLanguages(client, config);
       }
    });
 }); //End of ready()
@@ -175,58 +172,82 @@ client.on('interactionCreate', async interaction => {
          continue;
       }
       let optionName = interaction.options._hoistedOptions[i]['name'];
-      //Pokemon
-      if (optionName == 'pokemon') {
-         let filteredList = pokemonList.filter(choice => choice.includes(focusedValue)).slice(0, 25);
-         sendAutoResponse(filteredList);
-      }
-      //Raid
-      else if (optionName == 'type' && interaction.commandName == config.raidCommand) {
-         let filteredList = (Object.keys(util.raidLevels).concat(pokemonList)).filter(choice => choice.includes(focusedValue)).slice(0, 25);
-         sendAutoResponse(filteredList);
-      }
-      //Incident
-      else if (optionName == 'type' && interaction.commandName == config.incidentCommand) {
-         var incidents = [];
-         for (const [type, rewards] of Object.entries(incidentList)) {
-            incidents.push(`${type} (${rewards.join(', ')})`);
-         } //End of type loop
-         let filteredList = incidents.filter(choice => choice.includes(focusedValue)).slice(0, 25);
-         sendAutoResponse(filteredList);
-      }
-      //Quest
-      else if (optionName == 'type' && interaction.commandName == config.questCommand) {
-         let filteredList = await Object.keys(questList).filter(choice => choice.includes(focusedValue)).slice(0, 25);
-         //console.log(filteredList)
-         sendAutoResponse(filteredList);
-      }
-      //Templates
-      else if (optionName == 'template') {
-         let templateType = interaction.commandName.replace(config.pokemonCommand, 'monster').replace(config.raidCommand, 'raid').replace(config.incidentCommand, 'invasion').replace(config.questCommand, 'quest').replace(config.lureCommand, 'lure');
-         let allTemplates = templateList[templateType];
-         var availableTemplates = [];
-         for (var a in allTemplates){
-            if (!config.ignoreTemplates.includes(allTemplates[a])){
-               availableTemplates.push(allTemplates[a]);
-            }
-         }
-         try {
-            let filteredList = availableTemplates.filter(choice => choice.includes(focusedValue)).slice(0, 25);
-            if (filteredList.length > 0) {
-               sendAutoResponse(filteredList);
-            }
-         } catch (err) {
-            console.log("Error getting templates:", err);
-         }
-      }
-      //Profiles
-      else if (optionName == 'profile') {
-         createProfileList();
-      }
       //Remove
-      else if (optionName == 'tracking' && interaction.commandName == config.removeCommand) {
+      if (optionName == 'tracking' && interaction.commandName == config.removeCommand.toLowerCase().replaceAll(/[^a-z0-9]/gi, '_')) {
          Remove.autoComplete(client, interaction, config, util, questList);
+         break;
       }
+
+      //Get user language
+      superagent
+         .get(util.api.humanInfo.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
+         .set('X-Poracle-Secret', config.poracle.secret)
+         .set('accept', 'application/json')
+         .end((error, response) => {
+            if (error) {
+               console.log('Api error:', error);
+               autoCompleteCommands("en");
+            } else {
+               let responseText = JSON.parse(response.text);
+               if (responseText.human.language) {
+                  autoCompleteCommands(responseText.human.language);
+               } else {
+                  autoCompleteCommands("en");
+               }
+            }
+         }); //End of superagent
+
+      async function autoCompleteCommands(language) {
+         //Pokemon
+         if (optionName == 'pokemon') {
+            //let filteredList = pokemonList.filter(choice => choice.includes(focusedValue)).slice(0, 25);
+            let filteredList = pokemonLists[language].filter(choice => choice.includes(focusedValue)).slice(0, 25);
+            sendAutoResponse(filteredList);
+         }
+         //Raid
+         else if (optionName == 'type' && interaction.commandName == config.raidCommand.toLowerCase().replaceAll(/[^a-z0-9]/gi, '_')) {
+            let filteredList = (Object.keys(util.raidLevels).concat(pokemonList)).filter(choice => choice.includes(focusedValue)).slice(0, 25);
+            sendAutoResponse(filteredList);
+         }
+         //Incident
+         else if (optionName == 'type' && interaction.commandName == config.incidentCommand.toLowerCase().replaceAll(/[^a-z0-9]/gi, '_')) {
+            var incidents = [];
+            for (const [type, rewards] of Object.entries(incidentList)) {
+               incidents.push(`${type} (${rewards.join(', ')})`);
+            } //End of type loop
+            let filteredList = incidents.filter(choice => choice.includes(focusedValue)).slice(0, 25);
+            sendAutoResponse(filteredList);
+         }
+         //Quest
+         else if (optionName == 'type' && interaction.commandName == config.questCommand.toLowerCase().replaceAll(/[^a-z0-9]/gi, '_')) {
+            let filteredList = await Object.keys(questList).filter(choice => choice.includes(focusedValue)).slice(0, 25);
+            //console.log(filteredList)
+            sendAutoResponse(filteredList);
+         }
+         //Templates
+         else if (optionName == 'template') {
+            let templateType = interaction.commandName.replace(config.pokemonCommand, 'monster').replace(config.raidCommand, 'raid').replace(config.incidentCommand, 'invasion').replace(config.questCommand, 'quest').replace(config.lureCommand, 'lure');
+            let allTemplates = templateList[templateType];
+            var availableTemplates = [];
+            for (var a in allTemplates) {
+               if (!config.ignoreTemplates.includes(allTemplates[a])) {
+                  availableTemplates.push(allTemplates[a]);
+               }
+            }
+            try {
+               let filteredList = availableTemplates.filter(choice => choice.includes(focusedValue)).slice(0, 25);
+               if (filteredList.length > 0) {
+                  sendAutoResponse(filteredList);
+               }
+            } catch (err) {
+               console.log("Error getting templates:", err);
+            }
+         }
+         //Profiles
+         else if (optionName == 'profile') {
+            createProfileList();
+         }
+      } //End of autoCompleteCommands()
    } //End of i loop
 
    async function createProfileList() {
@@ -269,6 +290,42 @@ client.on('interactionCreate', async interaction => {
 }); //End of autoComplete
 
 
+async function getLanguages(client, config) {
+   //Get languages
+   request("https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/index.json", {
+      json: true
+   }, (error, res, body) => {
+      if (error) {
+         return console.log(error)
+      };
+      if (!error && res.statusCode == 200) {
+         let languages = body;
+         createLocales(client, config, languages);
+      }
+   });
+} //End of getLanguages()
+
+
+async function createLocales(client, config, languages) {
+   await Promise.all(languages.map((locale) =>
+      fetch(`https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/static/enRefMerged/${locale}`)
+      .then((response) => response.json())
+      .then((json) => fs.writeFileSync(`./locale/${locale}`, JSON.stringify(json, null, 2)))
+      .catch((e) => console.log(`Error fetching translations for ${locale}: ${e}`))
+   ));
+   console.log("Finished updating locales");
+
+   //Register Commands
+   updateConfigRegisterCommands(client, config);
+
+   //Update lists
+   createPokemonList();
+   createTemplateList();
+   createIncidentList();
+   createQuestList();
+}
+
+
 async function createPokemonList() {
    let ignoreForms = [];
    for (const [dex, monData] of Object.entries(master.pokemon)) {
@@ -282,6 +339,32 @@ async function createPokemonList() {
          }
       }
    }
+
+   let localeFiles = fs.readdirSync('./locale').filter(file => file.endsWith('.json'));
+   //Loop over each locale
+   for (const file of localeFiles) {
+      let localeName = file.replace('.json', '');
+      let locale = JSON.parse(fs.readFileSync(`./locale/${file}`));
+      var localeMonList = [];
+      //Translate from master
+      for (const [dex, monData] of Object.entries(master.pokemon)) {
+         //Base form
+         let baseMonName = locale[monData.name] ? locale[monData.name].toLowerCase() : monData.name.toLowerCase();
+         localeMonList.push(baseMonName);
+         if (monData.forms['0'] == {} || Object.keys(monData.forms).length == 1) {
+            continue;
+         }
+         //Other forms
+         for (const [form, formData] of Object.entries(monData.forms)) {
+            if (formData.name) {
+               let formName = locale[formData.name] ? locale[formData.name].toLowerCase() : formData.name.toLowerCase();
+               localeMonList.push(`${baseMonName} (${formName})`);
+            }
+         }
+      } //End of master loop
+      //Save translations to memory
+      pokemonLists[localeName] = localeMonList;
+   } //End of locale loop
 } //End of createPokemonList()
 
 

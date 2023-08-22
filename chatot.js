@@ -34,13 +34,34 @@ const Remove = require('./functions/remove.js');
 var util = require('./util.json');
 var pokemonList = [];
 var pokemonLists = {};
+var moveLists = {};
 var templateList = {};
 var incidentList = {};
 var questList = {};
 var master = "";
+var gameData = "";
+
+//Config check
+let newConfigChecklist = ["infoCommand"];
+for (var n in newConfigChecklist) {
+   if (!config[newConfigChecklist[n]]) {
+      console.error("Config is missing:", newConfigChecklist[n])
+   }
+}
 
 client.on('ready', async () => {
    console.log("Chatot Logged In");
+   //Update monsterData
+   request("https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest-poracle.json", {
+      json: true
+   }, (error, res, body) => {
+      if (error) {
+         return console.log(error)
+      };
+      if (!error && res.statusCode == 200) {
+         gameData = body;
+      }
+   });
    //Update masterfile
    request("https://raw.githubusercontent.com/WatWowMap/Masterfile-Generator/master/master-latest-react-map.json", {
       json: true
@@ -54,6 +75,7 @@ client.on('ready', async () => {
       }
    });
 }); //End of ready()
+
 
 //Buttons
 client.on('interactionCreate', async interaction => {
@@ -75,8 +97,8 @@ client.on('interactionCreate', async interaction => {
       }
    }
    //Add pokemon
-   else if (interactionID == 'track~verify') {
-      Track.addTrackCommand(client, interaction, config, util, master);
+   else if (interactionID.startsWith('track~verify~')){
+      Track.addTrackCommand(client, interaction, config, util, master, interactionID.replace('track~verify~',''));
    }
    //Edit areas
    else if (interactionID.startsWith('area~edit')) {
@@ -152,7 +174,7 @@ client.on('interactionCreate', async interaction => {
          }
       }); //End of superagent
    try {
-      let slashReturn = await command.execute(client, interaction, config, util);
+      let slashReturn = await command.execute(client, interaction, config, util, master, pokemonLists, moveLists);
    } catch (error) {
       console.error(error);
       await interaction.reply({
@@ -166,7 +188,7 @@ client.on('interactionCreate', async interaction => {
 //AutoComplete
 client.on('interactionCreate', async interaction => {
    if (!interaction.isAutocomplete()) return;
-   let focusedValue = await interaction.options.getFocused();
+   let focusedValue = await interaction.options.getFocused().toLowerCase();
    for (var i in interaction.options._hoistedOptions) {
       if (!interaction.options._hoistedOptions[i]['focused'] == true) {
          continue;
@@ -198,54 +220,67 @@ client.on('interactionCreate', async interaction => {
          }); //End of superagent
 
       async function autoCompleteCommands(language) {
-         //Pokemon
-         if (optionName == 'pokemon') {
-            //let filteredList = pokemonList.filter(choice => choice.includes(focusedValue)).slice(0, 25);
-            let filteredList = pokemonLists[language].filter(choice => choice.includes(focusedValue)).slice(0, 25);
-            sendAutoResponse(filteredList);
-         }
-         //Raid
-         else if (optionName == 'type' && interaction.commandName == config.raidCommand.toLowerCase().replaceAll(/[^a-z0-9]/gi, '_')) {
-            let filteredList = (Object.keys(util.raidLevels).concat(pokemonList)).filter(choice => choice.includes(focusedValue)).slice(0, 25);
-            sendAutoResponse(filteredList);
-         }
-         //Incident
-         else if (optionName == 'type' && interaction.commandName == config.incidentCommand.toLowerCase().replaceAll(/[^a-z0-9]/gi, '_')) {
-            var incidents = [];
-            for (const [type, rewards] of Object.entries(incidentList)) {
-               incidents.push(`${type} (${rewards.join(', ')})`);
-            } //End of type loop
-            let filteredList = incidents.filter(choice => choice.includes(focusedValue)).slice(0, 25);
-            sendAutoResponse(filteredList);
-         }
-         //Quest
-         else if (optionName == 'type' && interaction.commandName == config.questCommand.toLowerCase().replaceAll(/[^a-z0-9]/gi, '_')) {
-            let filteredList = await Object.keys(questList).filter(choice => choice.includes(focusedValue)).slice(0, 25);
-            //console.log(filteredList)
-            sendAutoResponse(filteredList);
-         }
-         //Templates
-         else if (optionName == 'template') {
-            let templateType = interaction.commandName.replace(config.pokemonCommand, 'monster').replace(config.raidCommand, 'raid').replace(config.incidentCommand, 'invasion').replace(config.questCommand, 'quest').replace(config.lureCommand, 'lure');
-            let allTemplates = templateList[templateType];
-            var availableTemplates = [];
-            for (var a in allTemplates) {
-               if (!config.ignoreTemplates.includes(allTemplates[a])) {
-                  availableTemplates.push(allTemplates[a]);
+         try {
+            //Pokemon
+            if (optionName == 'pokemon') {
+               let filteredList = Object.keys(pokemonLists[language]).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
+               await interaction.respond(
+                  filteredList.map(choice => ({
+                     name: choice,
+                     value: `${choice}~${pokemonLists[language][choice]}`
+                  }))
+               ).catch(console.error);
+            }
+            //Move
+            else if (optionName == 'name' && interaction.options['_subcommand'] == 'move' && interaction.commandName == config.infoCommand.toLowerCase().replaceAll(/[^a-z0-9]/gi, '_')) {
+               let filteredList = Object.keys(moveLists[language]).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
+               sendAdvAutoResponse(moveLists[language], filteredList, language);
+            }
+            //Raid
+            else if (optionName == 'type' && interaction.commandName == config.raidCommand.toLowerCase().replaceAll(/[^a-z0-9]/gi, '_')) {
+               let filteredList = (Object.keys(util.raidLevels).concat(pokemonList)).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
+               sendAutoResponse(filteredList);
+            }
+            //Incident
+            else if (optionName == 'type' && interaction.commandName == config.incidentCommand.toLowerCase().replaceAll(/[^a-z0-9]/gi, '_')) {
+               var incidents = [];
+               for (const [type, rewards] of Object.entries(incidentList)) {
+                  incidents.push(`${type} (${rewards.join(', ')})`);
+               } //End of type loop
+               let filteredList = incidents.filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
+               sendAutoResponse(filteredList);
+            }
+            //Quest
+            else if (optionName == 'type' && interaction.commandName == config.questCommand.toLowerCase().replaceAll(/[^a-z0-9]/gi, '_')) {
+               let filteredList = await Object.keys(questList).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
+               //console.log(filteredList)
+               sendAutoResponse(filteredList);
+            }
+            //Templates
+            else if (optionName == 'template') {
+               let templateType = interaction.commandName.replace(config.pokemonCommand, 'monster').replace(config.raidCommand, 'raid').replace(config.incidentCommand, 'invasion').replace(config.questCommand, 'quest').replace(config.lureCommand, 'lure');
+               let allTemplates = templateList[templateType];
+               var availableTemplates = [];
+               for (var a in allTemplates) {
+                  if (!config.ignoreTemplates.includes(allTemplates[a])) {
+                     availableTemplates.push(allTemplates[a]);
+                  }
+               }
+               try {
+                  let filteredList = availableTemplates.filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
+                  if (filteredList.length > 0) {
+                     sendAutoResponse(filteredList);
+                  }
+               } catch (err) {
+                  console.log("Error getting templates:", err);
                }
             }
-            try {
-               let filteredList = availableTemplates.filter(choice => choice.includes(focusedValue)).slice(0, 25);
-               if (filteredList.length > 0) {
-                  sendAutoResponse(filteredList);
-               }
-            } catch (err) {
-               console.log("Error getting templates:", err);
+            //Profiles
+            else if (optionName == 'profile') {
+               createProfileList();
             }
-         }
-         //Profiles
-         else if (optionName == 'profile') {
-            createProfileList();
+         } catch (err) {
+            console.log(err);
          }
       } //End of autoCompleteCommands()
    } //End of i loop
@@ -287,6 +322,15 @@ client.on('interactionCreate', async interaction => {
          }))
       ).catch(console.error);
    } //End of sendAutoResponse()
+
+   async function sendAdvAutoResponse(localeMoves, filteredList, language) {
+      await interaction.respond(
+         filteredList.map(choice => ({
+            name: choice,
+            value: `${localeMoves[choice]}~${language}`
+         }))
+      ).catch(console.error);
+   } //End of sendAdvAutoResponse()
 }); //End of autoComplete
 
 
@@ -320,6 +364,7 @@ async function createLocales(client, config, languages) {
 
    //Update lists
    createPokemonList();
+   createMoveLists();
    createTemplateList();
    createIncidentList();
    createQuestList();
@@ -328,6 +373,7 @@ async function createLocales(client, config, languages) {
 
 async function createPokemonList() {
    let ignoreForms = [];
+   //Create basic English list
    for (const [dex, monData] of Object.entries(master.pokemon)) {
       pokemonList.push(monData.name.toLowerCase());
       if (monData.forms['0'] == {} || Object.keys(monData.forms).length == 1) {
@@ -339,33 +385,49 @@ async function createPokemonList() {
          }
       }
    }
+   let localeFiles = fs.readdirSync('./locale').filter(file => file.endsWith('.json'));
+   //Loop over each locale
+   for (const file of localeFiles) {
+      let language = file.replace('.json', '');
+      let locale = JSON.parse(fs.readFileSync(`./locale/${file}`));
+      var localeMonList = {};
+      for (const [dexForm, monData] of Object.entries(gameData.monsters)) {
+         let monName = locale[monData.name] ? locale[monData.name] : monData.name;
+         //Add base form
+         if (dexForm.endsWith('_0')) {
+            localeMonList[monName] = dexForm;
+         }
+         //Add alt form
+         else {
+            //Compare to list in master to help skip some
+            if (pokemonList.includes(`${monData.name.toLowerCase()} (${monData.form.name.toLowerCase()})`)) {
+               let formName = locale[monData.form.name] ? locale[monData.form.name] : monData.form.name;
+               localeMonList[`${monName} (${formName})`] = dexForm;
+            }
+         }
+      } //End of monsters loop
+      pokemonLists[language] = localeMonList;
+   } //End of file loop
+} //End of createPokemonList()
 
+
+async function createMoveLists() {
    let localeFiles = fs.readdirSync('./locale').filter(file => file.endsWith('.json'));
    //Loop over each locale
    for (const file of localeFiles) {
       let localeName = file.replace('.json', '');
       let locale = JSON.parse(fs.readFileSync(`./locale/${file}`));
-      var localeMonList = [];
+      var localeMoveList = {};
       //Translate from master
-      for (const [dex, monData] of Object.entries(master.pokemon)) {
-         //Base form
-         let baseMonName = locale[monData.name] ? locale[monData.name].toLowerCase() : monData.name.toLowerCase();
-         localeMonList.push(baseMonName);
-         if (monData.forms['0'] == {} || Object.keys(monData.forms).length == 1) {
-            continue;
-         }
-         //Other forms
-         for (const [form, formData] of Object.entries(monData.forms)) {
-            if (formData.name) {
-               let formName = locale[formData.name] ? locale[formData.name].toLowerCase() : formData.name.toLowerCase();
-               localeMonList.push(`${baseMonName} (${formName})`);
-            }
+      for (const [moveNumber, moveData] of Object.entries(master.moves)) {
+         if (moveData.type) {
+            //localeMoveList.push(locale[moveData.name] ? locale[moveData.name] : moveData.name);
+            localeMoveList[locale[moveData.name] ? locale[moveData.name] : moveData.name] = moveNumber;
          }
       } //End of master loop
-      //Save translations to memory
-      pokemonLists[localeName] = localeMonList;
+      moveLists[localeName] = localeMoveList;
    } //End of locale loop
-} //End of createPokemonList()
+} //End of createMoveLists()
 
 
 async function createQuestList() {
@@ -481,7 +543,7 @@ async function createTemplateList() {
 
 
 async function createIncidentList() {
-   request("https://rocket.malte.im/api/characters", {
+   request(util.api.rocketApi, {
       json: true
    }, (error, res, body) => {
       if (error) {
@@ -523,7 +585,7 @@ async function createIncidentList() {
 
 async function updateConfigRegisterCommands(client, config) {
    superagent
-      .get(`http://${config.poracle.host}:${config.poracle.port}/api/config/poracleWeb`)
+      .get(util.api.poracleWebConfig.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port))
       .set('X-Poracle-Secret', config.poracle.secret)
       .set('accept', 'application/json')
       .end((error, response) => {

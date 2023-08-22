@@ -13,7 +13,12 @@
       "addIncident": "http://{{host}}:{{port}}/api/tracking/invasion/{{id}}",
       "addQuest": "http://{{host}}:{{port}}/api/tracking/quest/{{id}}",
       "addLure": "http://{{host}}:{{port}}/api/tracking/lure/{{id}}",
-      "getTemplates": "http://{{host}}:{{port}}/api/config/templates"
+      "getTemplates": "http://{{host}}:{{port}}/api/config/templates",
+      "poracleWebConfig": "http://{{host}}:{{port}}/api/config/poracleWeb",
+      "gameDataAll": "http://{{host}}:{{port}}/api/masterdata/all",
+      "gameDataTypes": "http://{{host}}:{{port}}/api/masterdata/types",
+      "gameDataUtilData": "http://{{host}}:{{port}}/api/masterdata/utilData",
+      "rocketApi": "https://rocket.malte.im/api/characters"
    },
    "raidLevels": {
       "Tier 1": 1,
@@ -83,5 +88,891 @@
       "magnetic": 504,
       "rainy": 505,
       "golden": 506
+   },
+   "types": {
+      "Normal": {
+         "strengths": [],
+         "weaknesses": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }],
+         "veryWeakAgainst": [{
+            "typeId": 8,
+            "typeName": "Ghost"
+         }],
+         "immunes": [{
+            "typeId": 8,
+            "typeName": "Ghost"
+         }],
+         "weakAgainst": [{
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }],
+         "resistances": []
+      },
+      "Fighting": {
+         "strengths": [{
+            "typeId": 1,
+            "typeName": "Normal"
+         }, {
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 15,
+            "typeName": "Ice"
+         }, {
+            "typeId": 17,
+            "typeName": "Dark"
+         }],
+         "weaknesses": [{
+            "typeId": 3,
+            "typeName": "Flying"
+         }, {
+            "typeId": 14,
+            "typeName": "Psychic"
+         }, {
+            "typeId": 18,
+            "typeName": "Fairy"
+         }],
+         "veryWeakAgainst": [{
+            "typeId": 8,
+            "typeName": "Ghost"
+         }],
+         "immunes": [],
+         "weakAgainst": [{
+            "typeId": 3,
+            "typeName": "Flying"
+         }, {
+            "typeId": 4,
+            "typeName": "Poison"
+         }, {
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 14,
+            "typeName": "Psychic"
+         }, {
+            "typeId": 18,
+            "typeName": "Fairy"
+         }],
+         "resistances": [{
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 17,
+            "typeName": "Dark"
+         }]
+      },
+      "Flying": {
+         "strengths": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }],
+         "weaknesses": [{
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 13,
+            "typeName": "Electric"
+         }, {
+            "typeId": 15,
+            "typeName": "Ice"
+         }],
+         "veryWeakAgainst": [],
+         "immunes": [{
+            "typeId": 5,
+            "typeName": "Ground"
+         }],
+         "weakAgainst": [{
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 13,
+            "typeName": "Electric"
+         }],
+         "resistances": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }]
+      },
+      "Poison": {
+         "strengths": [{
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 18,
+            "typeName": "Fairy"
+         }],
+         "weaknesses": [{
+            "typeId": 5,
+            "typeName": "Ground"
+         }, {
+            "typeId": 14,
+            "typeName": "Psychic"
+         }],
+         "veryWeakAgainst": [{
+            "typeId": 9,
+            "typeName": "Steel"
+         }],
+         "immunes": [],
+         "weakAgainst": [{
+            "typeId": 4,
+            "typeName": "Poison"
+         }, {
+            "typeId": 5,
+            "typeName": "Ground"
+         }, {
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 8,
+            "typeName": "Ghost"
+         }],
+         "resistances": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 4,
+            "typeName": "Poison"
+         }, {
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 18,
+            "typeName": "Fairy"
+         }]
+      },
+      "Ground": {
+         "strengths": [{
+            "typeId": 4,
+            "typeName": "Poison"
+         }, {
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }, {
+            "typeId": 13,
+            "typeName": "Electric"
+         }],
+         "weaknesses": [{
+            "typeId": 11,
+            "typeName": "Water"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 15,
+            "typeName": "Ice"
+         }],
+         "veryWeakAgainst": [{
+            "typeId": 3,
+            "typeName": "Flying"
+         }],
+         "immunes": [{
+            "typeId": 13,
+            "typeName": "Electric"
+         }],
+         "weakAgainst": [{
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }],
+         "resistances": [{
+            "typeId": 4,
+            "typeName": "Poison"
+         }, {
+            "typeId": 6,
+            "typeName": "Rock"
+         }]
+      },
+      "Rock": {
+         "strengths": [{
+            "typeId": 3,
+            "typeName": "Flying"
+         }, {
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }, {
+            "typeId": 15,
+            "typeName": "Ice"
+         }],
+         "weaknesses": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 5,
+            "typeName": "Ground"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 11,
+            "typeName": "Water"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }],
+         "veryWeakAgainst": [],
+         "immunes": [],
+         "weakAgainst": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 5,
+            "typeName": "Ground"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }],
+         "resistances": [{
+            "typeId": 1,
+            "typeName": "Normal"
+         }, {
+            "typeId": 3,
+            "typeName": "Flying"
+         }, {
+            "typeId": 4,
+            "typeName": "Poison"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }]
+      },
+      "Bug": {
+         "strengths": [{
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 14,
+            "typeName": "Psychic"
+         }, {
+            "typeId": 17,
+            "typeName": "Dark"
+         }],
+         "weaknesses": [{
+            "typeId": 3,
+            "typeName": "Flying"
+         }, {
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }],
+         "veryWeakAgainst": [],
+         "immunes": [],
+         "weakAgainst": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 3,
+            "typeName": "Flying"
+         }, {
+            "typeId": 4,
+            "typeName": "Poison"
+         }, {
+            "typeId": 8,
+            "typeName": "Ghost"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }, {
+            "typeId": 18,
+            "typeName": "Fairy"
+         }],
+         "resistances": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 5,
+            "typeName": "Ground"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }]
+      },
+      "Ghost": {
+         "strengths": [{
+            "typeId": 8,
+            "typeName": "Ghost"
+         }, {
+            "typeId": 14,
+            "typeName": "Psychic"
+         }],
+         "weaknesses": [{
+            "typeId": 8,
+            "typeName": "Ghost"
+         }, {
+            "typeId": 17,
+            "typeName": "Dark"
+         }],
+         "veryWeakAgainst": [{
+            "typeId": 1,
+            "typeName": "Normal"
+         }],
+         "immunes": [{
+            "typeId": 1,
+            "typeName": "Normal"
+         }, {
+            "typeId": 2,
+            "typeName": "Fighting"
+         }],
+         "weakAgainst": [{
+            "typeId": 17,
+            "typeName": "Dark"
+         }],
+         "resistances": [{
+            "typeId": 4,
+            "typeName": "Poison"
+         }, {
+            "typeId": 7,
+            "typeName": "Bug"
+         }]
+      },
+      "Steel": {
+         "strengths": [{
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 15,
+            "typeName": "Ice"
+         }, {
+            "typeId": 18,
+            "typeName": "Fairy"
+         }],
+         "weaknesses": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 5,
+            "typeName": "Ground"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }],
+         "veryWeakAgainst": [],
+         "immunes": [{
+            "typeId": 4,
+            "typeName": "Poison"
+         }],
+         "weakAgainst": [{
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }, {
+            "typeId": 11,
+            "typeName": "Water"
+         }, {
+            "typeId": 13,
+            "typeName": "Electric"
+         }],
+         "resistances": [{
+            "typeId": 1,
+            "typeName": "Normal"
+         }, {
+            "typeId": 3,
+            "typeName": "Flying"
+         }, {
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 14,
+            "typeName": "Psychic"
+         }, {
+            "typeId": 15,
+            "typeName": "Ice"
+         }, {
+            "typeId": 16,
+            "typeName": "Dragon"
+         }, {
+            "typeId": 18,
+            "typeName": "Fairy"
+         }]
+      },
+      "Fire": {
+         "strengths": [{
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 15,
+            "typeName": "Ice"
+         }],
+         "weaknesses": [{
+            "typeId": 5,
+            "typeName": "Ground"
+         }, {
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 11,
+            "typeName": "Water"
+         }],
+         "veryWeakAgainst": [],
+         "immunes": [],
+         "weakAgainst": [{
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }, {
+            "typeId": 11,
+            "typeName": "Water"
+         }, {
+            "typeId": 16,
+            "typeName": "Dragon"
+         }],
+         "resistances": [{
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 15,
+            "typeName": "Ice"
+         }, {
+            "typeId": 18,
+            "typeName": "Fairy"
+         }]
+      },
+      "Water": {
+         "strengths": [{
+            "typeId": 5,
+            "typeName": "Ground"
+         }, {
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }],
+         "weaknesses": [{
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 13,
+            "typeName": "Electric"
+         }],
+         "veryWeakAgainst": [],
+         "immunes": [],
+         "weakAgainst": [{
+            "typeId": 11,
+            "typeName": "Water"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 16,
+            "typeName": "Dragon"
+         }],
+         "resistances": [{
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }, {
+            "typeId": 11,
+            "typeName": "Water"
+         }, {
+            "typeId": 15,
+            "typeName": "Ice"
+         }]
+      },
+      "Grass": {
+         "strengths": [{
+            "typeId": 5,
+            "typeName": "Ground"
+         }, {
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 11,
+            "typeName": "Water"
+         }],
+         "weaknesses": [{
+            "typeId": 3,
+            "typeName": "Flying"
+         }, {
+            "typeId": 4,
+            "typeName": "Poison"
+         }, {
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }, {
+            "typeId": 15,
+            "typeName": "Ice"
+         }],
+         "veryWeakAgainst": [],
+         "immunes": [],
+         "weakAgainst": [{
+            "typeId": 3,
+            "typeName": "Flying"
+         }, {
+            "typeId": 4,
+            "typeName": "Poison"
+         }, {
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 16,
+            "typeName": "Dragon"
+         }],
+         "resistances": [{
+            "typeId": 5,
+            "typeName": "Ground"
+         }, {
+            "typeId": 11,
+            "typeName": "Water"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 13,
+            "typeName": "Electric"
+         }]
+      },
+      "Electric": {
+         "strengths": [{
+            "typeId": 3,
+            "typeName": "Flying"
+         }, {
+            "typeId": 11,
+            "typeName": "Water"
+         }],
+         "weaknesses": [{
+            "typeId": 5,
+            "typeName": "Ground"
+         }],
+         "veryWeakAgainst": [{
+            "typeId": 5,
+            "typeName": "Ground"
+         }],
+         "immunes": [],
+         "weakAgainst": [{
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 13,
+            "typeName": "Electric"
+         }, {
+            "typeId": 16,
+            "typeName": "Dragon"
+         }],
+         "resistances": [{
+            "typeId": 3,
+            "typeName": "Flying"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 13,
+            "typeName": "Electric"
+         }]
+      },
+      "Psychic": {
+         "strengths": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 4,
+            "typeName": "Poison"
+         }],
+         "weaknesses": [{
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 8,
+            "typeName": "Ghost"
+         }, {
+            "typeId": 17,
+            "typeName": "Dark"
+         }],
+         "veryWeakAgainst": [{
+            "typeId": 17,
+            "typeName": "Dark"
+         }],
+         "immunes": [],
+         "weakAgainst": [{
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 14,
+            "typeName": "Psychic"
+         }],
+         "resistances": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 14,
+            "typeName": "Psychic"
+         }]
+      },
+      "Ice": {
+         "strengths": [{
+            "typeId": 3,
+            "typeName": "Flying"
+         }, {
+            "typeId": 5,
+            "typeName": "Ground"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 16,
+            "typeName": "Dragon"
+         }],
+         "weaknesses": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 6,
+            "typeName": "Rock"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }],
+         "veryWeakAgainst": [],
+         "immunes": [],
+         "weakAgainst": [{
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }, {
+            "typeId": 11,
+            "typeName": "Water"
+         }, {
+            "typeId": 15,
+            "typeName": "Ice"
+         }],
+         "resistances": [{
+            "typeId": 15,
+            "typeName": "Ice"
+         }]
+      },
+      "Dragon": {
+         "strengths": [{
+            "typeId": 16,
+            "typeName": "Dragon"
+         }],
+         "weaknesses": [{
+            "typeId": 15,
+            "typeName": "Ice"
+         }, {
+            "typeId": 16,
+            "typeName": "Dragon"
+         }, {
+            "typeId": 18,
+            "typeName": "Fairy"
+         }],
+         "veryWeakAgainst": [{
+            "typeId": 18,
+            "typeName": "Fairy"
+         }],
+         "immunes": [],
+         "weakAgainst": [{
+            "typeId": 9,
+            "typeName": "Steel"
+         }],
+         "resistances": [{
+            "typeId": 10,
+            "typeName": "Fire"
+         }, {
+            "typeId": 11,
+            "typeName": "Water"
+         }, {
+            "typeId": 12,
+            "typeName": "Grass"
+         }, {
+            "typeId": 13,
+            "typeName": "Electric"
+         }]
+      },
+      "Dark": {
+         "strengths": [{
+            "typeId": 8,
+            "typeName": "Ghost"
+         }, {
+            "typeId": 14,
+            "typeName": "Psychic"
+         }],
+         "weaknesses": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 18,
+            "typeName": "Fairy"
+         }],
+         "veryWeakAgainst": [],
+         "immunes": [{
+            "typeId": 14,
+            "typeName": "Psychic"
+         }],
+         "weakAgainst": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 17,
+            "typeName": "Dark"
+         }, {
+            "typeId": 18,
+            "typeName": "Fairy"
+         }],
+         "resistances": [{
+            "typeId": 8,
+            "typeName": "Ghost"
+         }, {
+            "typeId": 17,
+            "typeName": "Dark"
+         }]
+      },
+      "Fairy": {
+         "strengths": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 16,
+            "typeName": "Dragon"
+         }, {
+            "typeId": 17,
+            "typeName": "Dark"
+         }],
+         "weaknesses": [{
+            "typeId": 4,
+            "typeName": "Poison"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }],
+         "veryWeakAgainst": [],
+         "immunes": [{
+            "typeId": 16,
+            "typeName": "Dragon"
+         }],
+         "weakAgainst": [{
+            "typeId": 4,
+            "typeName": "Poison"
+         }, {
+            "typeId": 9,
+            "typeName": "Steel"
+         }, {
+            "typeId": 10,
+            "typeName": "Fire"
+         }],
+         "resistances": [{
+            "typeId": 2,
+            "typeName": "Fighting"
+         }, {
+            "typeId": 7,
+            "typeName": "Bug"
+         }, {
+            "typeId": 17,
+            "typeName": "Dark"
+         }]
+      }
+   },
+   "typeColor": {
+      "Normal": "A8A878",
+      "Fighting": "C03028",
+      "Flying": "A890F0",
+      "Poison": "A040A0",
+      "Ground": "E0C068",
+      "Rock": "B8A038",
+      "Bug": "A8B820",
+      "Ghost": "705898",
+      "Steel": "B8B8D0",
+      "Fire": "F08030",
+      "Water": "6890F0",
+      "Grass": "78C850",
+      "Electric": "F8D030",
+      "Psychic": "F85888",
+      "Ice": "98D8D8",
+      "Dragon": "7038F8",
+      "Dark": "705848",
+      "Fairy": "EE99AC"
    }
 }

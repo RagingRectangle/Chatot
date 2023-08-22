@@ -7,7 +7,7 @@ const {
 const superagent = require('superagent');
 
 module.exports = {
-   addTrackCommand: async function addTrackCommand(client, interaction, config, util, master) {
+   addTrackCommand: async function addTrackCommand(client, interaction, config, util, master, dex_form) {
       try {
          let customFilters = await interaction.message.embeds[0]['data']['fields'];
          var filters = {
@@ -42,24 +42,10 @@ module.exports = {
             "max_rarity": 6,
             "min_time": 0
          };
-         //Add Pokemon id + form
-         for (const [dex, monData] of Object.entries(master.pokemon)) {
-            let filterNameSplit = customFilters[0]['value'].split(' ');
-            let masterNameSplit = monData['name'].toLowerCase().split(' ');
-            if (monData['name'].toLowerCase() == customFilters[0]['value'] || filterNameSplit[0] == masterNameSplit[0]) {
-               filters.pokemon_id = dex * 1;
-               //No form
-               filters.form = 0;
-               //Special form
-               if (monData['name'].toLowerCase() != customFilters[0]['value']) {
-                  for (const [form, formData] of Object.entries(monData['forms'])) {
-                     if (customFilters[0]['value'] == `${monData['name'].toLowerCase()} (${formData['name'].toLowerCase()})`) {
-                        filters.form = form * 1;
-                     }
-                  } //End of form loop
-               }
-            } //End of name start match
-         } //End of master loop
+         //Add Pokemon/form
+         let monOptions = dex_form.split('_');
+         filters.pokemon_id = monOptions[0] * 1;
+         filters.form = monOptions[1] * 1;
          //Other stuff
          filters.template = config.defaultTemplateName;
          for (var c = 1; c < customFilters.length; c++) {
@@ -102,8 +88,6 @@ module.exports = {
                   }
                }
             }
-
-
             //No changes needed: distance, min_iv, max_iv, min_cp, max_cp, min_level, max_level, max_atk, max_def, max_sta, min_time
             filters[customFilters[c]['name']] = customFilters[c]['value'] * 1;
          } //End of c loop
@@ -134,42 +118,53 @@ module.exports = {
 
 
    verifyTrackCommand: async function verifyTrackCommand(client, interaction) {
-      await interaction.deferReply();
-      let options = interaction.options._hoistedOptions;
-      var trackEmbed = new EmbedBuilder().setTitle(`New Pokemon Alert:`);
-      for (var i in options) {
-         //Verify pvp options
-         if (options[i].name == 'pvp_ranks') {
-            continue;
-         }
-         if (options[i].name == 'pvp_league') {
-            for (var p in options) {
-               if (options[p].name == 'pvp_ranks') {
-                  trackEmbed.addFields({
-                        name: options[i].name,
-                        value: options[i].value.toString(),
-                        inline: true
-                     })
-                     .addFields({
-                        name: options[p].name,
-                        value: options[p].value.toString(),
-                        inline: true
-                     });
-               }
-            } //End of p loop
-         } else {
-            trackEmbed.addFields({
-               name: options[i].name,
-               value: options[i].value.toString(),
-               inline: true
-            });
-         }
-      } //End of i loop
-      let trackComponents = new ActionRowBuilder().addComponents(new ButtonBuilder().setLabel('Verify').setCustomId(`chatot~track~verify`).setStyle(ButtonStyle.Success)).addComponents(new ButtonBuilder().setLabel('Cancel').setCustomId(`chatot~delete`).setStyle(ButtonStyle.Danger));
-      await interaction.editReply({
-         embeds: [trackEmbed],
-         components: [trackComponents],
-         ephemeral: true
-      }).catch(console.error);
+      try {
+         await interaction.deferReply();
+         let options = interaction.options._hoistedOptions;
+         let userPokemonOptions = options[0]['value'].split('~');
+         let monName = userPokemonOptions[0];
+         let dexForm = userPokemonOptions[1];
+         var trackEmbed = new EmbedBuilder().setTitle(`New Pokemon Alert:`).addFields({
+            name: 'pokemon',
+            value: monName,
+            inline: true
+         });
+         for (var i = 1; i < options.length; i++) {
+            //Verify pvp options
+            if (options[i].name == 'pvp_ranks') {
+               continue;
+            }
+            if (options[i].name == 'pvp_league') {
+               for (var p in options) {
+                  if (options[p].name == 'pvp_ranks') {
+                     trackEmbed.addFields({
+                           name: options[i].name,
+                           value: options[i].value.toString(),
+                           inline: true
+                        })
+                        .addFields({
+                           name: options[p].name,
+                           value: options[p].value.toString(),
+                           inline: true
+                        });
+                  }
+               } //End of p loop
+            } else {
+               trackEmbed.addFields({
+                  name: options[i].name,
+                  value: options[i].value.toString(),
+                  inline: true
+               });
+            }
+         } //End of i loop
+         let trackComponents = new ActionRowBuilder().addComponents(new ButtonBuilder().setLabel('Verify').setCustomId(`chatot~track~verify~${dexForm}`).setStyle(ButtonStyle.Success)).addComponents(new ButtonBuilder().setLabel('Cancel').setCustomId(`chatot~delete`).setStyle(ButtonStyle.Danger));
+         await interaction.editReply({
+            embeds: [trackEmbed],
+            components: [trackComponents],
+            ephemeral: true
+         }).catch(console.error);
+      } catch (err) {
+         console.log(err);
+      }
    }, //End of verifyTrackCommand()
 }

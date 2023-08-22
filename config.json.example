@@ -22,6 +22,7 @@
    "questCommand": "quest",
    "lureCommand": "lure",
    "removeCommand": "remove",
+   "infoCommand": "info",
    "pvpFilterMaxRank": "Will be autofilled with api",
    "pvpFilterGreatMinCP": "Will be autofilled with api",
    "pvpFilterUltraMinCP": "Will be autofilled with api",

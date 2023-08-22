@@ -47,7 +47,7 @@ Poracle:
  - **database:** Poracle database info
 
 - **ignoreTemplates:** List names of any templates you don't want to appear as options.
-- **xxxCommand:** Slash command names. Leave blank if you don't want to include it.
+- **xxxCommand:** Slash command names. Use only lowercase. Leave blank if you don't want to include it.
 - **EverythingElse:** Just a placeholder, will be filled out with api.
  
   

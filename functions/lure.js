@@ -54,7 +54,7 @@ module.exports = {
       } catch (err) {
          console.log("Error adding lure tracking:", err);
       }
-   }, //End of addIncident()
+   }, //End of addLure()
 
 
    verifyLure: async function verifyLure(client, interaction) {

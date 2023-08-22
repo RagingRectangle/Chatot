@@ -1,4 +1,9 @@
 
 node_modules/
 config.json
+gameData.json
+Master.json
+moveLists.json
+typeList.json
+pokemonLists.json
 package-lock.json

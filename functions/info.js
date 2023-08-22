@@ -100,11 +100,11 @@ module.exports = {
          try {
             var moveEmbed = new EmbedBuilder().setTitle(`${moveData.name} (${moveData.class})`).setColor(util.typeColor[master.types[moveData.typeNumber]]);
             var description = `- **Type:** ${locale[moveData.type] ? locale[moveData.type] : moveData.type}
-- **Boosted By**: ${moveData.weatherBoosts.join(', ')}
-- **Strong Against**: ${moveData.strengths.join(', ')}
-- **Weak Against**: ${moveData.weakAgainst.join(', ')}
-- **Very Weak Against:**: ${moveData.veryWeakAgainst.join(', ')}
-- **Pokemon Availability**: 
+- **Boosted By:** ${moveData.weatherBoosts.join(', ')}
+- **Strong Against:** ${moveData.strengths.join(', ')}
+- **Weak Against:** ${moveData.weakAgainst.join(', ')}
+- **Very Weak Against:** ${moveData.veryWeakAgainst.join(', ')}
+- **Pokemon Availability:** 
    - ${moveData.pokemon.join('\n  - ')}`;
             moveEmbed.setDescription(description);
             await interaction.editReply({

@@ -12,3 +12,4 @@ raidLists.json
 incidentList.json
 package-lock.json
 *.log
+docker-compose.yml

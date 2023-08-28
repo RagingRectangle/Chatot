@@ -2,7 +2,7 @@ FROM node:16
 
 WORKDIR /usr/src/app
 
-COPY ../Chatot-dev .
+COPY . .
 RUN npm install
 
 CMD ["node", "chatot.js"]

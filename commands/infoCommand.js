@@ -4,37 +4,49 @@ const {
 } = require('discord.js');
 const config = require('../config.json');
 const Info = require('../functions/info.js');
+const defaults = require('../locale/custom/default.json');
+const localizations = require('../locale/custom/customCommands.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName((config.infoCommand).toLowerCase().replaceAll(/[^a-z0-9]/gi, '_'))
-		.setDescription(`Get more information`)
+		.setNameLocalizations(localizations.infoCommand ? localizations.infoCommand : {})
+		.setDescription(defaults.infoDescription)
+		.setDescriptionLocalizations(localizations.infoDescription)
 		//.addSubcommand(subcommand =>
 		//	subcommand
-		//	.setName('pokemon')
-		//	.setDescription('Details about Pokemon')
+		//	.setName(defaults.pokemonName)
+		//	.setNameLocalizations(localizations.pokemonName)
+		//	.setDescription(defaults.pokemonDescription)
+		//	.setDescriptionLocalizations(localizations.pokemonDescription)
 		//	.addStringOption(option =>
-		//		option.setName('name')
-		//		.setDescription(`Enter Pokemon name`)
+		//		option.setName(defaults.pokemonName)
+		//		.setNameLocalizations(localizations.pokemonName)
+		//		.setDescription(defaults.pokemonDescription)
+		//		.setDescriptionLocalizations(localizations.pokemonDescription)
 		//		.setRequired(true)
 		//		.setAutocomplete(true)))
 		.addSubcommand(subcommand =>
 			subcommand
-			.setName('move')
-			.setDescription('Details about moves')
+			.setName(defaults.infoMoveName)
+			.setNameLocalizations(localizations.infoMoveName)
+			.setDescription(defaults.infoMoveDescription)
+			.setDescriptionLocalizations(localizations.infoMoveDescription)
 			.addStringOption(option =>
-				option.setName('name')
-				.setDescription(`Enter move name`)
+				option.setName(defaults.infoMoveName)
+				.setNameLocalizations(localizations.infoMoveName)
+				.setDescription(defaults.infoMoveDescription)
+				.setDescriptionLocalizations(localizations.infoMoveDescription)
 				.setRequired(true)
 				.setAutocomplete(true))),
 
 
-	async execute(client, interaction, config, util, master, pokemonLists, moveLists) {
+	async execute(client, interaction, config, util, master, pokemonLists, moveLists, locale, humanInfo) {
 		await interaction.deferReply();
-		if (interaction.options._subcommand == 'pokemon') {
-			Info.pokemon(client, interaction, config, util, master, pokemonLists, moveLists);
-		} else if (interaction.options._subcommand == 'move') {
-			Info.move(client, interaction, config, util, master, pokemonLists, moveLists);
+		if (interaction.options._subcommand == defaults.pokemonName) {
+			Info.pokemon(client, interaction, config, util, master, pokemonLists, moveLists, locale);
+		} else if (interaction.options._subcommand == defaults.infoMoveName) {
+			Info.move(client, interaction, config, util, master, pokemonLists, moveLists, locale);
 		}
 	}, //End of execute()
 };

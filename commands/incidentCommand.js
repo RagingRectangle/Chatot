@@ -3,32 +3,48 @@ const {
 } = require('discord.js');
 const config = require('../config.json');
 const Incident = require('../functions/incident.js');
+const defaults = require('../locale/custom/default.json');
+const localizations = require('../locale/custom/customCommands.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName((config.incidentCommand).toLowerCase().replaceAll(/[^a-z0-9]/gi, '_'))
-		.setDescription(`Add Incident Alert`)
+		.setNameLocalizations(localizations.incidentCommand ? localizations.incidentCommand : {})
+		.setDescription(defaults.incidentDescription)
+		.setDescriptionLocalizations(localizations.incidentDescription)
+		//Incident Type
 		.addStringOption(option =>
-			option.setName('type')
-			.setDescription(`Enter leader or grunt type`)
+			option.setName(defaults.incidentTypeName)
+			.setNameLocalizations(localizations.incidentTypeName)
+			.setDescription(defaults.incidentTypeDescription)
+			.setDescriptionLocalizations(localizations.incidentTypeDescription)
 			.setRequired(true)
 			.setAutocomplete(true))
+		//Max Distance
 		.addIntegerOption(option =>
-			option.setName('distance')
-			.setDescription(`Distance away in meters`)
+			option.setName(defaults.distanceName)
+			.setNameLocalizations(localizations.distanceName)
+			.setDescription(defaults.distanceDescription)
+			.setDescriptionLocalizations(localizations.distanceDescription)
 			.setMinValue(0)
 			.setMaxValue(config.maxDistance))
+		//Clean
 		.addBooleanOption(option =>
-			option.setName('clean')
-			.setDescription('Auto delete after expiration'))
+			option.setName(defaults.cleanName)
+			.setNameLocalizations(localizations.cleanName)
+			.setDescription(defaults.cleanDescription)
+			.setDescriptionLocalizations(localizations.cleanDescription))
+		//Template
 		.addStringOption(option =>
-			option.setName('template')
-			.setDescription(`Optional template name`)
+			option.setName(defaults.templateName)
+			.setNameLocalizations(localizations.templateName)
+			.setDescription(defaults.templateDescription)
+			.setDescriptionLocalizations(localizations.templateDescription)
 			.setAutocomplete(true)),
 
 
-	async execute(client, interaction) {
+	async execute(client, interaction, config, util, master, pokemonLists, moveLists, locale, humanInfo, incidentLists) {
 		await interaction.deferReply();
-		Incident.verifyIncident(client, interaction);
+		Incident.verifyIncident(client, interaction, incidentLists, locale, humanInfo);
 	}, //End of execute()
 };

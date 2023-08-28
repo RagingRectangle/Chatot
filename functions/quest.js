@@ -1,83 +1,107 @@
 const {
-   ActionRowBuilder,
-   ButtonBuilder,
-   ButtonStyle,
-   EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  EmbedBuilder,
 } = require('discord.js');
 const superagent = require('superagent');
+const defaults = require('../locale/custom/default.json');
 
 module.exports = {
-   addQuest: async function addQuest(client, interaction, config, util, questList) {
-      try {
-         let customFilters = interaction.message.embeds[0]['data']['fields'];
-         var filters = {
-            "ping": "",
-            "amount": 0,
-            "shiny": 0,
-            "distance": 0,
-            "clean": 0
-         };
-         //Type
-         filters.reward = questList[customFilters[0]['value']]['reward'];
-         filters.reward_type = questList[customFilters[0]['value']]['type'];
-         filters.form = questList[customFilters[0]['value']]['form'];
-         //Other stuff
-         filters.template = config.defaultTemplateName;
-         for (var f in customFilters) {
-            //Distance
-            if (customFilters[f]['name'] == 'distance') {
-               filters.distance = customFilters[f]['value'] * 1;
+  addQuest: async function addQuest(client, interaction, config, util, questInteractionID) {
+    //rewardType~reward~form~${minAmount}~${distance}~${clean}~${template}
+    try {
+      let questOptions = questInteractionID.split('~');
+      var filters = {
+        "reward_type": questOptions[0] * 1,
+        "reward": questOptions[1] * 1,
+        "form": questOptions[2] * 1,
+        "amount": questOptions[3] * 1,
+        "distance": questOptions[4] * 1,
+        "clean": questOptions[5] * 1,
+        "template": questOptions[6],
+        "shiny": 0,
+        "ping": ""
+      };
+      //console.log(filters);
+      superagent
+        .post(util.api.addQuest.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
+        .send([filters])
+        .set('X-Poracle-Secret', config.poracle.secret)
+        .set('accept', 'application/json')
+        .end((error, response) => {
+          if (error) {
+            console.log('Api error:', error);
+          } else {
+            let responseText = JSON.parse(response.text);
+            if (responseText.status == 'ok') {
+              setTimeout(() => interaction.message.delete().catch(err => console.log("Failed to delete message:", err)), 1);
+            } else {
+              console.log("Failed to add new quest tracking:", response);
             }
-            //Clean
-            if (customFilters[f]['name'] == 'clean' && customFilters[f]['value'] == 'true') {
-               filters.clean = 1;
-            }
-            //Template
-            if (customFilters[f]['name'] == 'template') {
-               filters.template = customFilters[f]['value'].replace(' (Default)', '');
-            }
-            //Min_amount
-            if (customFilters[f]['name'] == 'min_amount' && filters.reward_type != 7) {
-               filters.amount = customFilters[f]['value'] * 1;
-            }
-         } //End of f loop
-         //console.log(filters)
-         superagent
-            .post(util.api.addQuest.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
-            .send([filters])
-            .set('X-Poracle-Secret', config.poracle.secret)
-            .set('accept', 'application/json')
-            .end((error, response) => {
-               if (error) {
-                  console.log('Api error:', error);
-               } else {
-                  let responseText = JSON.parse(response.text);
-                  if (responseText.status == 'ok') {
-                     setTimeout(() => interaction.message.delete().catch(err => console.log("Failed to delete message:", err)), 1);
-                  } else {
-                     console.log("Failed to add new quest tracking:", response);
-                  }
-               }
-            }); //End of superagent
-      } catch (err) {
-         console.log("Error adding quest:", err);
-      }
-   }, //End of addQuest()
+          }
+        }); //End of superagent
+    } catch (err) {
+      console.log(err);
+    }
+  }, //End of addQuest()
 
 
-   verifyQuest: async function verifyQuest(client, interaction) {
-      let options = interaction.options._hoistedOptions;
-      var questEmbed = new EmbedBuilder().setTitle(`New Quest Alert:`);
-      for (var i in options) {
-         questEmbed.addFields({
-            name: options[i].name,
-            value: options[i].value.toString()
-         });
+  verifyQuest: async function verifyQuest(client, interaction, config, locale, humanInfo, questLists) {
+    try {
+      let options = await interaction.options._hoistedOptions;
+      let questData = await questLists[humanInfo.language][options[0]['value']]; //rewardType~reward~form
+      var questEmbed = new EmbedBuilder().setTitle(locale.questDescription).addFields({
+        name: locale.questTypeName,
+        value: options[0]['value']
+      });
+      //Other options
+      var minAmount = 0;
+      var distance = 0;
+      var clean = '';
+      var template = config.defaultTemplateName;
+      for (var i = 1; i < options.length; i++) {
+        //Min amount
+        if (options[i]['name'] == defaults.questMinAmountName && !questData.startsWith('7~')) {
+          minAmount = options[i]['value'].toString();
+          questEmbed.addFields({
+            name: locale.questMinAmountName,
+            value: minAmount
+          });
+        }
+        //Distance
+        if (options[i]['name'] == defaults.distanceName) {
+          distance = options[i]['value'].toString();
+          questEmbed.addFields({
+            name: locale.distanceName,
+            value: distance
+          });
+        }
+        //Clean
+        if (options[i]['name'] == defaults.cleanName && options[i]['value'] == true) {
+          clean = '1';
+          questEmbed.addFields({
+            name: locale.cleanName,
+            value: 'true'
+          });
+        }
+        //Template
+        if (options[i]['name'] == defaults.templateName) {
+          template = options[i]['value'];
+          questEmbed.addFields({
+            name: locale.templateName,
+            value: template
+          });
+        }
       } //End of i loop
-      let questComponents = new ActionRowBuilder().addComponents(new ButtonBuilder().setLabel('Verify').setCustomId(`chatot~quest~verify`).setStyle(ButtonStyle.Success)).addComponents(new ButtonBuilder().setLabel('Cancel').setCustomId(`chatot~delete`).setStyle(ButtonStyle.Danger));
+      let customID = `chatot~quest~verify~${questData}~${minAmount}~${distance}~${clean}~${template}`;
+      let questComponents = new ActionRowBuilder().addComponents(new ButtonBuilder().setLabel(locale.buttonVerify).setCustomId(customID).setStyle(ButtonStyle.Success)).addComponents(new ButtonBuilder().setLabel(locale.buttonCancel).setCustomId(`chatot~delete`).setStyle(ButtonStyle.Danger));
       await interaction.editReply({
-         embeds: [questEmbed],
-         components: [questComponents]
+        embeds: [questEmbed],
+        components: [questComponents]
       }).catch(console.error);
-   } //End of verifyQuest()
+    } catch (err) {
+      console.log(err);
+    }
+  } //End of verifyQuest()
 }

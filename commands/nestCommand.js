@@ -2,32 +2,32 @@ const {
 	SlashCommandBuilder
 } = require('discord.js');
 const config = require('../config.json');
-const Quest = require('../functions/quest.js');
+const Nest = require('../functions/nest.js');
 const defaults = require('../locale/custom/default.json');
 const localizations = require('../locale/custom/customCommands.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName((config.questCommand).toLowerCase().replaceAll(/[^a-z0-9]/gi, '_'))
-		.setNameLocalizations(localizations.questCommand ? localizations.questCommand : {})
-		.setDescription(defaults.questDescription)
-		.setDescriptionLocalizations(localizations.questDescription)
-		//Quest type
+		.setName((config.nestCommand).toLowerCase().replaceAll(/[^a-z0-9]/gi, '_'))
+		.setNameLocalizations(localizations.nestCommand ? localizations.nestCommand : {})
+		.setDescription(defaults.nestDescription)
+		.setDescriptionLocalizations(localizations.nestDescription)
 		.addStringOption(option =>
-			option.setName(defaults.questTypeName)
-			.setNameLocalizations(localizations.questTypeName)
-			.setDescription(defaults.questTypeDescription)
-			.setDescriptionLocalizations(localizations.questTypeDescription)
+			//Nesting Pokemon
+			option.setName(defaults.pokemonName)
+			.setNameLocalizations(localizations.pokemonName)
+			.setDescription(defaults.pokemonDescription)
+			.setDescriptionLocalizations(localizations.pokemonDescription)
 			.setRequired(true)
 			.setAutocomplete(true))
-		//Min amount
+		//Min Average
 		.addIntegerOption(option =>
-			option.setName(defaults.questMinAmountName)
-			.setNameLocalizations(localizations.questMinAmountName)
-			.setDescription(defaults.questMinAmountDescription)
-			.setDescriptionLocalizations(localizations.questMinAmountDescription)
+			option.setName(defaults.nestAverageName)
+			.setNameLocalizations(localizations.nestAverageName)
+			.setDescription(defaults.nestAverageDescription)
+			.setDescriptionLocalizations(localizations.nestAverageDescription)
 			.setMinValue(0))
-		//Max distance
+		//Max Distance
 		.addIntegerOption(option =>
 			option.setName(defaults.distanceName)
 			.setNameLocalizations(localizations.distanceName)
@@ -39,8 +39,8 @@ module.exports = {
 		.addBooleanOption(option =>
 			option.setName(defaults.cleanName)
 			.setNameLocalizations(localizations.cleanName)
-			.setDescription(defaults.cleanDescription))
-			.setDescriptionLocalizations(localizations.cleanDescription)
+			.setDescription(defaults.cleanDescription)
+			.setDescriptionLocalizations(localizations.cleanDescription))
 		//Template
 		.addStringOption(option =>
 			option.setName(defaults.templateName)
@@ -50,8 +50,8 @@ module.exports = {
 			.setAutocomplete(true)),
 
 
-	async execute(client, interaction, config, util, master, pokemonLists, moveLists, locale, humanInfo, incidentLists, raidLists, questLists) {
+	async execute(client, interaction, config, util, master, pokemonLists, moveLists, locale, humanInfo) {
 		await interaction.deferReply();
-		Quest.verifyQuest(client, interaction, config, locale, humanInfo, questLists);
+		Nest.verifyNest(client, interaction, util, locale);
 	}, //End of execute()
 };

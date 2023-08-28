@@ -3,50 +3,72 @@ const {
 } = require('discord.js');
 const config = require('../config.json');
 const Lure = require('../functions/lure.js');
+const defaults = require('../locale/custom/default.json');
+const localizations = require('../locale/custom/customCommands.json');
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName((config.lureCommand).toLowerCase().replaceAll(/[^a-z0-9]/gi, '_'))
-		.setDescription(`Add Lure Alert`)
+		.setNameLocalizations(localizations.lureCommand ? localizations.lureCommand : {})
+		.setDescription(defaults.lureDescription)
+		.setDescriptionLocalizations(localizations.lureDescription)
 		.addStringOption(option =>
-			option.setName('type')
-			.setDescription(`Select lure type`)
+			//Lure Type
+			option.setName(defaults.lureTypeName)
+			.setNameLocalizations(localizations.lureTypeName)
+			.setDescription(defaults.lureTypeDescription)
+			.setDescriptionLocalizations(localizations.lureTypeDescription)
 			.setRequired(true)
 			.addChoices({
-				name: 'basic',
-				value: 'basic'
+				name: defaults.lureStandard,
+				name_localizations: localizations.lureStandard,
+				value: "501"
 			}, {
-				name: 'glacial',
-				value: 'glacial'
+				name: defaults.lureGlacial,
+				name_localizations: localizations.lureGlacial,
+				value: "502"
 			}, {
-				name: 'mossy',
-				value: 'mossy'
+				name: defaults.lureMagnetic,
+				name_localizations: localizations.lureMagnetic,
+				value: "504"
 			}, {
-				name: 'magnetic',
-				value: 'magnetic'
+				name: defaults.lureMossy,
+				name_localizations: localizations.lureMossy,
+				value: "503"
 			}, {
-				name: 'rainy',
-				value: 'rainy'
+				name: defaults.lureRainy,
+				name_localizations: localizations.lureRainy,
+				value: "505"
 			}, {
-				name: 'golden',
-				value: 'golden'
+				name: defaults.lureGolden,
+				name_localizations: localizations.lureGolden,
+				value: "506"
 			}))
+		//Max Distance
 		.addIntegerOption(option =>
-			option.setName('distance')
-			.setDescription(`Distance away in meters`)
+			option.setName(defaults.distanceName)
+			.setNameLocalizations(localizations.distanceName)
+			.setDescription(defaults.distanceDescription)
+			.setDescriptionLocalizations(localizations.distanceDescription)
 			.setMinValue(0)
 			.setMaxValue(config.maxDistance))
+		//Clean
 		.addBooleanOption(option =>
-			option.setName('clean')
-			.setDescription('Auto delete after expiration'))
+			option.setName(defaults.cleanName)
+			.setNameLocalizations(localizations.cleanName)
+			.setDescription(defaults.cleanDescription)
+			.setDescriptionLocalizations(localizations.cleanDescription))
+		//Template
 		.addStringOption(option =>
-			option.setName('template')
-			.setDescription(`Optional template name`)
+			option.setName(defaults.templateName)
+			.setNameLocalizations(localizations.templateName)
+			.setDescription(defaults.templateDescription)
+			.setDescriptionLocalizations(localizations.templateDescription)
 			.setAutocomplete(true)),
 
 
-	async execute(client, interaction) {
+	async execute(client, interaction, config, util, master, pokemonLists, moveLists, locale, humanInfo) {
 		await interaction.deferReply();
-		Lure.verifyLure(client, interaction);
+		Lure.verifyLure(client, interaction, util, locale);
 	}, //End of execute()
 };

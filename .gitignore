@@ -6,4 +6,8 @@ Master.json
 moveLists.json
 typeList.json
 pokemonLists.json
+questLists.json
+megaLists.json
+raidLists.json
+incidentList.json
 package-lock.json

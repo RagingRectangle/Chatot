@@ -375,7 +375,7 @@ async function createLocales(client, config, languages) {
 
   try {
     //Create localizations for commands
-    let customCommandFiles = fs.readdirSync('./locale/custom').filter(file => file != 'default.json' && file != 'customCommands.json' && file.endsWith('.json'));
+    let customCommandFiles = fs.readdirSync('./locale/custom').filter(file => file != 'default.json' && file != 'customCommands.json' && file != 'local.json' && file.endsWith('.json'));
     let defaultKeys = Object.keys(require('./locale/custom/default.json'));
     var commandLocalizations = {};
     for (var d in defaultKeys) {

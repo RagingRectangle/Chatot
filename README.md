@@ -1,3 +1,7 @@
+<p align="center">
+  <img width="150" alt="Chatot" src="https://github.com/RagingRectangle/Chatot/assets/33229005/45855b66-8d07-4368-88fa-79c9cb6f65d6">
+</p>
+
 # Chatot
 
 ## About

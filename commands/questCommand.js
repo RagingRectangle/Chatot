@@ -39,8 +39,8 @@ module.exports = {
 		.addBooleanOption(option =>
 			option.setName(defaults.cleanName)
 			.setNameLocalizations(localizations.cleanName)
-			.setDescription(defaults.cleanDescription))
-			.setDescriptionLocalizations(localizations.cleanDescription)
+			.setDescription(defaults.cleanDescription)
+			.setDescriptionLocalizations(localizations.cleanDescription))
 		//Template
 		.addStringOption(option =>
 			option.setName(defaults.templateName)

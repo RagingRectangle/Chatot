@@ -66,6 +66,7 @@ client.on('ready', async () => {
       if (!error && res.statusCode == 200) {
         master = body;
         gameData['questRewardTypes'] = master['questRewardTypes'];
+
         getLanguages(client, config);
       } else {
         console.log('Error updating data/locales:', error);
@@ -202,7 +203,7 @@ client.on('interactionCreate', async interaction => {
   async function runSlashCommand(language) {
     try {
       let locale = await require(`./locale/${language}.json`);
-      let slashReturn = await command.execute(client, interaction, config, util, master, pokemonLists, moveLists, locale, humanInfo.human, incidentLists, raidLists, questLists);
+      let slashReturn = await command.execute(client, interaction, config, util, master, pokemonLists, moveLists, locale, humanInfo.human, incidentLists, raidLists, questLists, gameData);
     } catch (error) {
       console.error(error);
       await interaction.reply({
@@ -366,6 +367,7 @@ async function createLocales(client, config, languages) {
         fs.writeFileSync(`./locale/zh-TW.json`, JSON.stringify(languageJson, null, 2));
       }
       if (locale == 'en.json') {
+        fs.writeFileSync(`./locale/en-US.json`, JSON.stringify(languageJson, null, 2));
         fs.writeFileSync(`./locale/en-GB.json`, JSON.stringify(languageJson, null, 2));
       }
     })

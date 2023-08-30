@@ -8,9 +8,13 @@ const superagent = require('superagent');
 const defaults = require('../locale/custom/default.json');
 
 module.exports = {
-  pokemon: async function pokemon(client, interaction, config, util, master, pokemonLists, moveLists, locale) {
+  //pokemon: async function pokemon(client, interaction, config, util, master, pokemonLists, moveLists, locale, gameData) {
+  //  let monData = interaction.options._hoistedOptions[0]['value'].split('~');
+  //  let monName = monData[0];
+  //  let dexForm = monData[1];
+  //  var pokemonEmbed = new EmbedBuilder().setTitle()
 
-  }, //End of pokemon()
+  //}, //End of pokemon()
 
 
   move: async function move(client, interaction, config, util, master, pokemonLists, moveLists, locale) {

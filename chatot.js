@@ -346,7 +346,7 @@ async function createLocales(client, config, languages) {
       try {
         if (fs.existsSync(`./locale/custom/${locale}`)) {
           let customJson = require(`./locale/custom/${locale}`);
-          languageJson = Object.assign(customJson, languageJson);
+          languageJson = Object.assign(languageJson, customJson);
         }
       } catch (err) {
         console.log(err);
@@ -657,12 +657,14 @@ async function updateConfigRegisterCommands(client, config) {
       } else {
         let body = JSON.parse(response.text);
         config.defaultLocale = body.locale;
+        config.defaultTemplateName = body.defaultTemplateName;
         config.pvpFilterMaxRank = body.pvpFilterMaxRank;
         config.pvpFilterGreatMinCP = body.pvpFilterGreatMinCP;
         config.pvpFilterUltraMinCP = body.pvpFilterUltraMinCP;
         config.pvpFilterLittleMinCP = body.pvpFilterLittleMinCP;
         config.maxDistance = body.maxDistance;
-        config.defaultTemplateName = body.defaultTemplateName;
+        config.defaultDistance = body.defaultDistance;
+        config.everythingFlagPermissions = body.everythingFlagPermissions;
         //Register Slash Commands
         SlashRegistry.registerCommands(client, config);
       }

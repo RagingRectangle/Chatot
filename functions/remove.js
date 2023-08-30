@@ -348,7 +348,7 @@ function createDescription(apiName, config, util, gameData, language, alert) {
 
     //Pokemon
     if (apiName == 'pokemon') {
-      let monData = gameData.monsters[`${alert.pokemon_id}_${alert.form}`];
+      let monData = gameData.monsters[`${alert.pokemon_id}_${alert.form}`] ? gameData.monsters[`${alert.pokemon_id}_${alert.form}`] :  gameData.monsters[`${alert.pokemon_id}_0`];
       var filters = [];
       //Pokemon
       filters.push(locale[monData.name] ? locale[monData.name] : monData.name);

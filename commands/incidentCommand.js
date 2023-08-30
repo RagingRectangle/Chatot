@@ -27,7 +27,7 @@ module.exports = {
 			.setDescription(defaults.distanceDescription)
 			.setDescriptionLocalizations(localizations.distanceDescription)
 			.setMinValue(0)
-			.setMaxValue(config.maxDistance))
+			.setMaxValue(config.maxDistance != 0 ? config.maxDistance : 999999))
 		//Clean
 		.addBooleanOption(option =>
 			option.setName(defaults.cleanName)

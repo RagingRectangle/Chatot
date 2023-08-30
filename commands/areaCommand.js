@@ -12,19 +12,19 @@ module.exports = {
 		.setName((config.areaCommand).toLowerCase().replaceAll(/[^a-z0-9]/gi, '_'))
 		.setNameLocalizations(localizations.areaCommand ? localizations.areaCommand : {})
 		.setDescription(defaults.areaDescription)
-		.setDescriptionLocalizations(localizations.areaDescription ? localizations.areaDescription : {})
+		.setDescriptionLocalizations(localizations.areaDescription)
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName(defaults.areaEditName)
-				.setNameLocalizations(localizations.areaEditName ? localizations.areaEditName : {})
+				.setNameLocalizations(localizations.areaEditName)
 				.setDescription(defaults.areaEditDescription)
-				.setDescriptionLocalizations(localizations.areaEditDescription ? localizations.areaEditDescription: {}))
+				.setDescriptionLocalizations(localizations.areaEditDescription))
 		.addSubcommand(subcommand =>
 			subcommand
 				.setName(defaults.areaShowName)
-				.setNameLocalizations(localizations.areaShowName ? localizations.areaShowName : {})
+				.setNameLocalizations(localizations.areaShowName)
 				.setDescription(defaults.areaShowDescription)
-				.setDescriptionLocalizations(localizations.areaShowDescription ? localizations.areaShowDescription : {})),
+				.setDescriptionLocalizations(localizations.areaShowDescription)),
 
 
 	async execute(client, interaction, config, util, master, pokemonLists, moveLists, locale, humanInfo) {

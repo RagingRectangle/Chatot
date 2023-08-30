@@ -124,16 +124,16 @@ client.on('interactionCreate', async interaction => {
   //Get humanInfo
   try {
     superagent
-      .get(util.api.humanInfo.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
-      .set('X-Poracle-Secret', config.poracle.secret)
-      .end((error, response) => {
-        if (error) {
-          console.log('Api error:', error);
-        } else {
-          let humanInfo = JSON.parse(response.text);
-          humanInfoButtons(humanInfo.human);
-        }
-      }); //End of superagent
+        .get(util.api.humanInfo.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
+        .set('X-Poracle-Secret', config.poracle.secret)
+        .end((error, response) => {
+          if (error) {
+            console.log('Api error:', error);
+          } else {
+            let humanInfo = JSON.parse(response.text);
+            humanInfoButtons(humanInfo.human);
+          }
+        }); //End of superagent
   } catch (err) {
     console.log("Error fetching humanInfo:", err);
   }
@@ -183,21 +183,21 @@ client.on('interactionCreate', async interaction => {
   //Check for user
   var humanInfo = '';
   superagent
-    .get(util.api.humanInfo.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
-    .set('X-Poracle-Secret', config.poracle.secret)
-    .end((error, response) => {
-      if (error) {
-        console.log('Api error:', error);
-      } else {
-        humanInfo = JSON.parse(response.text);
-        if (humanInfo.status != 'ok') {
-          console.log(`User: ${interaction.user.id} | Command: ${interaction.commandName} | Error: ${humanInfo}`);
-          return;
+      .get(util.api.humanInfo.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
+      .set('X-Poracle-Secret', config.poracle.secret)
+      .end((error, response) => {
+        if (error) {
+          console.log('Api error:', error);
         } else {
-          runSlashCommand(humanInfo.human.language ? humanInfo.human.language : 'en');
+          humanInfo = JSON.parse(response.text);
+          if (humanInfo.status != 'ok') {
+            console.log(`User: ${interaction.user.id} | Command: ${interaction.commandName} | Error: ${humanInfo}`);
+            return;
+          } else {
+            runSlashCommand(humanInfo.human.language ? humanInfo.human.language : 'en');
+          }
         }
-      }
-    }); //End of superagent
+      }); //End of superagent
 
   async function runSlashCommand(language) {
     try {
@@ -225,22 +225,22 @@ client.on('interactionCreate', async interaction => {
     let optionName = interaction.options._hoistedOptions[i]['name'];
     //Get user language
     superagent
-      .get(util.api.humanInfo.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
-      .set('X-Poracle-Secret', config.poracle.secret)
-      .set('accept', 'application/json')
-      .end((error, response) => {
-        if (error) {
-          console.log('Api error:', error);
-          autoCompleteCommands("en");
-        } else {
-          let responseText = JSON.parse(response.text);
-          if (responseText.human.language) {
-            autoCompleteCommands(responseText.human.language);
-          } else {
+        .get(util.api.humanInfo.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
+        .set('X-Poracle-Secret', config.poracle.secret)
+        .set('accept', 'application/json')
+        .end((error, response) => {
+          if (error) {
+            console.log('Api error:', error);
             autoCompleteCommands("en");
+          } else {
+            let responseText = JSON.parse(response.text);
+            if (responseText.human.language) {
+              autoCompleteCommands(responseText.human.language);
+            } else {
+              autoCompleteCommands("en");
+            }
           }
-        }
-      }); //End of superagent
+        }); //End of superagent
 
     async function autoCompleteCommands(language) {
       try {
@@ -252,20 +252,20 @@ client.on('interactionCreate', async interaction => {
         if (optionName == defaults.pokemonName) {
           let filteredList = Object.keys(pokemonLists[language]).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
           await interaction.respond(
-            filteredList.map(choice => ({
-              name: choice,
-              value: `${choice}~${pokemonLists[language][choice]}`
-            }))
+              filteredList.map(choice => ({
+                name: choice,
+                value: `${choice}~${pokemonLists[language][choice]}`
+              }))
           ).catch(console.error);
         }
         //Move
         else if (optionName == defaults.infoMoveName && interaction.options['_subcommand'] == defaults.infoMoveName && interaction.commandName == config.infoCommand) {
           let filteredList = Object.keys(moveLists[language]).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
           await interaction.respond(
-            filteredList.map(choice => ({
-              name: choice,
-              value: `${moveLists[language][choice]}~${language}`
-            }))
+              filteredList.map(choice => ({
+                name: choice,
+                value: `${moveLists[language][choice]}~${language}`
+              }))
           ).catch(console.error);
         }
         //Incident
@@ -300,10 +300,10 @@ client.on('interactionCreate', async interaction => {
 
   async function sendAutoResponse(filteredList) {
     await interaction.respond(
-      filteredList.map(choice => ({
-        name: choice.toString(),
-        value: choice.toString()
-      }))
+        filteredList.map(choice => ({
+          name: choice.toString(),
+          value: choice.toString()
+        }))
     ).catch(console.error);
   } //End of sendAutoResponse()
 }); //End of autoComplete
@@ -337,45 +337,45 @@ async function createLocales(client, config, languages) {
     console.log(err);
   }
   await Promise.all(languages.map((locale) =>
-    fetch(`https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/static/enRefMerged/${locale}`)
-    .then((response) => response.json())
-    .then((pogoJson) => {
-      //Merge over defaults
-      var languageJson = Object.assign(pogoJson, defaultJson);
-      //Merge any custom files over defaults
-      try {
-        if (fs.existsSync(`./locale/custom/${locale}`)) {
-          let customJson = require(`./locale/custom/${locale}`);
-          languageJson = Object.assign(customJson, languageJson);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-      fs.writeFileSync(`./locale/${locale}`, JSON.stringify(languageJson, null, 2));
-      //Create duplicates for Discord differences
-      if (locale == 'es.json') {
-        fs.writeFileSync(`./locale/es-ES.json`, JSON.stringify(languageJson, null, 2));
-      }
-      if (locale == 'pt-br.json') {
-        fs.writeFileSync(`./locale/pt-BR.json`, JSON.stringify(languageJson, null, 2));
-      }
-      if (locale == 'sv.json') {
-        fs.writeFileSync(`./locale/sv-SE.json`, JSON.stringify(languageJson, null, 2));
-      }
-      if (locale == 'zh-tw.json') {
-        fs.writeFileSync(`./locale/zh-TW.json`, JSON.stringify(languageJson, null, 2));
-      }
-      if (locale == 'en.json') {
-        fs.writeFileSync(`./locale/en-GB.json`, JSON.stringify(languageJson, null, 2));
-      }
-    })
-    .catch((e) => console.log(`Error fetching translations for ${locale}: ${e}`))
+      fetch(`https://raw.githubusercontent.com/WatWowMap/pogo-translations/master/static/enRefMerged/${locale}`)
+          .then((response) => response.json())
+          .then((pogoJson) => {
+            //Merge over defaults
+            var languageJson = Object.assign(pogoJson, defaultJson);
+            //Merge any custom files over defaults
+            try {
+              if (fs.existsSync(`./locale/custom/${locale}`)) {
+                let customJson = require(`./locale/custom/${locale}`);
+                languageJson = Object.assign(customJson, languageJson);
+              }
+            } catch (err) {
+              console.log(err);
+            }
+            fs.writeFileSync(`./locale/${locale}`, JSON.stringify(languageJson, null, 2));
+            //Create duplicates for Discord differences
+            if (locale == 'es.json') {
+              fs.writeFileSync(`./locale/es-ES.json`, JSON.stringify(languageJson, null, 2));
+            }
+            if (locale == 'pt-br.json') {
+              fs.writeFileSync(`./locale/pt-BR.json`, JSON.stringify(languageJson, null, 2));
+            }
+            if (locale == 'sv.json') {
+              fs.writeFileSync(`./locale/sv-SE.json`, JSON.stringify(languageJson, null, 2));
+            }
+            if (locale == 'zh-tw.json') {
+              fs.writeFileSync(`./locale/zh-TW.json`, JSON.stringify(languageJson, null, 2));
+            }
+            if (locale == 'en.json') {
+              fs.writeFileSync(`./locale/en-GB.json`, JSON.stringify(languageJson, null, 2));
+            }
+          })
+          .catch((e) => console.log(`Error fetching translations for ${locale}: ${e}`))
   ));
   console.log("Finished updating locales");
 
   try {
     //Create localizations for commands
-    let customCommandFiles = fs.readdirSync('./locale/custom').filter(file => file != 'default.json' && file != 'customCommands.json' && file.endsWith('.json'));
+    let customCommandFiles = fs.readdirSync('./locale/custom').filter(file => file != 'default.json' && file != 'customCommands.json' && file != 'local.json' && file.endsWith('.json'));
     let defaultKeys = Object.keys(require('./locale/custom/default.json'));
     var commandLocalizations = {};
     for (var d in defaultKeys) {
@@ -627,19 +627,19 @@ async function createRaidLists() {
 async function createTemplateLists() {
   try {
     superagent
-      .get(util.api.getTemplates.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port))
-      .set('X-Poracle-Secret', config.poracle.secret)
-      .set('accept', 'application/json')
-      .end((error, response) => {
-        if (error) {
-          console.log('Api error:', error);
-        } else {
-          let responseText = JSON.parse(response.text);
-          if (responseText.status == 'ok') {
-            templateLists = responseText.discord;
+        .get(util.api.getTemplates.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port))
+        .set('X-Poracle-Secret', config.poracle.secret)
+        .set('accept', 'application/json')
+        .end((error, response) => {
+          if (error) {
+            console.log('Api error:', error);
+          } else {
+            let responseText = JSON.parse(response.text);
+            if (responseText.status == 'ok') {
+              templateLists = responseText.discord;
+            }
           }
-        }
-      }); //End of superagent
+        }); //End of superagent
   } catch (err) {
     console.log(err);
   }
@@ -648,25 +648,25 @@ async function createTemplateLists() {
 
 async function updateConfigRegisterCommands(client, config) {
   superagent
-    .get(util.api.poracleWebConfig.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port))
-    .set('X-Poracle-Secret', config.poracle.secret)
-    .set('accept', 'application/json')
-    .end((error, response) => {
-      if (error) {
-        console.log('Api error:', error);
-      } else {
-        let body = JSON.parse(response.text);
-        config.defaultLocale = body.locale;
-        config.pvpFilterMaxRank = body.pvpFilterMaxRank;
-        config.pvpFilterGreatMinCP = body.pvpFilterGreatMinCP;
-        config.pvpFilterUltraMinCP = body.pvpFilterUltraMinCP;
-        config.pvpFilterLittleMinCP = body.pvpFilterLittleMinCP;
-        config.maxDistance = body.maxDistance;
-        config.defaultTemplateName = body.defaultTemplateName;
-        //Register Slash Commands
-        SlashRegistry.registerCommands(client, config);
-      }
-    });
+      .get(util.api.poracleWebConfig.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port))
+      .set('X-Poracle-Secret', config.poracle.secret)
+      .set('accept', 'application/json')
+      .end((error, response) => {
+        if (error) {
+          console.log('Api error:', error);
+        } else {
+          let body = JSON.parse(response.text);
+          config.defaultLocale = body.locale;
+          config.pvpFilterMaxRank = body.pvpFilterMaxRank;
+          config.pvpFilterGreatMinCP = body.pvpFilterGreatMinCP;
+          config.pvpFilterUltraMinCP = body.pvpFilterUltraMinCP;
+          config.pvpFilterLittleMinCP = body.pvpFilterLittleMinCP;
+          config.maxDistance = body.maxDistance;
+          config.defaultTemplateName = body.defaultTemplateName;
+          //Register Slash Commands
+          SlashRegistry.registerCommands(client, config);
+        }
+      });
 } //End of updateConfigRegisterCommands()
 
 

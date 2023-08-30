@@ -32,12 +32,33 @@ Join the Discord server for any help and to keep up with updates: https://discor
 1: [PoracleJS](https://github.com/KartulUdus/PoracleJS)
 
 
-## Install
+## Installation
+
+### Running Chatot locally
+
+Run the following commands and it should run by itself:
+
 ```
 git clone https://github.com/RagingRectangle/Chatot.git
 cd Chatot
-cp config.json.example config.json
+cp -r config.json.example config.json
 npm install
+```
+
+### Using Docker
+
+You can create a container inside your poracle-setup to make sure that the database is reachable.
+
+```
+git clone https://github.com/RagingRectangle/Chatot.git &&
+cd Chatot &&
+cp -r config.json.example config.json
+```
+
+Fill out config.json and copy/paste the contents from `docker-compose.yml.example` inside of your compose-file where PoracleJS is in and run:
+
+```
+docker-compose up chatot
 ```
 
 ## Config Setup

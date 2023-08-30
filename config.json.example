@@ -5,6 +5,7 @@
     "host": "",
     "port": 3030,
     "database": {
+      // When using Docker, use your container name for host and the internal portnumber
       "host": "",
       "port": 3306,
       "user": "",
@@ -12,7 +13,9 @@
       "database": "poracle"
     }
   },
-  "ignoreTemplates": [""],
+  "ignoreTemplates": [
+    ""
+  ],
   "pokemonCommand": "track",
   "areaCommand": "area",
   "locationCommand": "location",
@@ -23,5 +26,5 @@
   "lureCommand": "lure",
   "removeCommand": "remove",
   "infoCommand": "info",
-   "nestCommand": "nest"
+  "nestCommand": "nest"
 }

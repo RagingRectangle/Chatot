@@ -128,5 +128,16 @@
   "removeTypeDescription": "Select tracking type",
   "removeAlertName": "alert",
   "removeAlertDescription": "Select tracking to remove",
-  "removedAlert": "Custom alert deleted"
+  "removedAlert": "Custom alert deleted",
+  "pokemonCommand": "",
+  "areaCommand": "",
+  "locationCommand": "",
+  "profileCommand": "",
+  "raidCommand": "",
+  "incidentCommand": "",
+  "questCommand": "",
+  "lureCommand": "",
+  "removeCommand": "",
+  "infoCommand": "",
+  "nestCommand": ""
 }

@@ -13,19 +13,19 @@ module.exports = {
 		.setNameLocalizations(localizations.infoCommand ? localizations.infoCommand : {})
 		.setDescription(defaults.infoDescription)
 		.setDescriptionLocalizations(localizations.infoDescription)
-		.addSubcommand(subcommand =>
-			subcommand
-			.setName(defaults.pokemonName)
-			.setNameLocalizations(localizations.pokemonName)
-			.setDescription(defaults.pokemonDescription)
-			.setDescriptionLocalizations(localizations.pokemonDescription)
-			.addStringOption(option =>
-				option.setName(defaults.pokemonName)
-				.setNameLocalizations(localizations.pokemonName)
-				.setDescription(defaults.pokemonDescription)
-				.setDescriptionLocalizations(localizations.pokemonDescription)
-				.setRequired(true)
-				.setAutocomplete(true)))
+		//.addSubcommand(subcommand =>
+		//	subcommand
+		//	.setName(defaults.pokemonName)
+		//	.setNameLocalizations(localizations.pokemonName)
+		//	.setDescription(defaults.pokemonDescription)
+		//	.setDescriptionLocalizations(localizations.pokemonDescription)
+		//	.addStringOption(option =>
+		//		option.setName(defaults.pokemonName)
+		//		.setNameLocalizations(localizations.pokemonName)
+		//		.setDescription(defaults.pokemonDescription)
+		//		.setDescriptionLocalizations(localizations.pokemonDescription)
+		//		.setRequired(true)
+		//		.setAutocomplete(true)))
 		.addSubcommand(subcommand =>
 			subcommand
 			.setName(defaults.infoMoveName)

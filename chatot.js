@@ -19,6 +19,7 @@ const Profile = require('./functions/profile.js');
 const Pokemon = require('./functions/pokemon.js');
 const Raid = require('./functions/raid.js');
 const Incident = require('./functions/incident.js');
+const Info = require('./functions/info.js');
 const Quest = require('./functions/quest.js');
 const Lure = require('./functions/lure.js');
 const Nest = require('./functions/nest.js');
@@ -77,7 +78,7 @@ client.on('ready', async () => {
 }); //End of ready()
 
 
-//Buttons
+//Buttons/Lists
 client.on('interactionCreate', async interaction => {
   if (interaction.type !== InteractionType.MessageComponent) {
     return;
@@ -99,11 +100,11 @@ client.on('interactionCreate', async interaction => {
   }
   //Doesn't need additional humanInfo
   //Add lure
-  if (interactionID.startsWith('chatot~lure~verify~')) {
+  else if (interactionID.startsWith('chatot~lure~verify~')) {
     Lure.addLure(client, interaction, config, util, interactionID.replace('chatot~lure~verify~', ''));
   }
   //Add nest
-  if (interactionID.startsWith('chatot~nest~verify~')) {
+  else if (interactionID.startsWith('chatot~nest~verify~')) {
     Nest.addNest(client, interaction, config, util, interactionID.replace('chatot~nest~verify~', ''));
   }
   //Add incident
@@ -119,29 +120,38 @@ client.on('interactionCreate', async interaction => {
     Quest.addQuest(client, interaction, config, util, interactionID.replace('chatot~quest~verify~', ''));
   }
   //Add pokemon
-  if (interactionID.startsWith('chatot~pokemon~verify~')) {
+  else if (interactionID.startsWith('chatot~pokemon~verify~')) {
     Pokemon.addPokemonCommand(client, interaction, config, util, interactionID.replace('chatot~pokemon~verify~', ''));
-  }
-  //Get humanInfo
-  try {
-    superagent
-      .get(util.api.humanInfo.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
-      .set('X-Poracle-Secret', config.poracle.secret)
-      .end((error, response) => {
-        if (error) {
-          console.log('Api error:', error);
-        } else {
-          let humanInfo = JSON.parse(response.text);
-          humanInfoButtons(humanInfo.human);
-        }
-      }); //End of superagent
-  } catch (err) {
-    console.log("Error fetching humanInfo:", err);
+  } else {
+    //Get humanInfo
+    try {
+      superagent
+        .get(util.api.humanInfo.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
+        .set('X-Poracle-Secret', config.poracle.secret)
+        .end((error, response) => {
+          if (error) {
+            console.log('Api error:', error);
+          } else {
+            var humanInfoAll = JSON.parse(response.text);
+            var humanInfo = humanInfoAll.human;
+            if (!humanInfo.language) {
+              humanInfo.language = config.defaultLanguage ? config.defaultLanguage : 'en';
+            }
+            humanInfoButtons(humanInfo);
+          }
+        }); //End of superagent
+    } catch (err) {
+      console.log("Error fetching humanInfo:", err);
+    }
   }
 
   async function humanInfoButtons(humanInfo) {
+    //Info Pokemon
+    if (interactionID.startsWith('chatot~info~pokemon')) {
+      Info.changePokemon(client, interaction, config, util, master, gameData, humanInfo, interaction.values[0]);
+    }
     //Edit areas
-    if (interactionID.startsWith('chatot~area~edit')) {
+    else if (interactionID.startsWith('chatot~area~edit')) {
       Area.editAreas(client, interaction, config, util, humanInfo);
     }
     //Add area
@@ -190,20 +200,24 @@ client.on('interactionCreate', async interaction => {
       if (error) {
         console.log('Api error:', error);
       } else {
-        humanInfo = JSON.parse(response.text);
-        if (humanInfo.status != 'ok') {
+        var humanInfoAll = JSON.parse(response.text);
+        var humanInfo = humanInfoAll.human;
+        if (humanInfoAll.status != 'ok') {
           console.log(`User: ${interaction.user.id} | Command: ${interaction.commandName} | Error: ${humanInfo}`);
           return;
         } else {
-          runSlashCommand(humanInfo.human.language ? humanInfo.human.language : 'en');
+          if (!humanInfo.language) {
+            humanInfo.language = config.defaultLanguage ? config.defaultLanguage : 'en';
+          }
+          runSlashCommand(humanInfo);
         }
       }
     }); //End of superagent
 
-  async function runSlashCommand(language) {
+  async function runSlashCommand(humanInfo) {
     try {
-      let locale = await require(`./locale/${language}.json`);
-      let slashReturn = await command.execute(client, interaction, config, util, master, pokemonLists, moveLists, locale, humanInfo.human, incidentLists, raidLists, questLists, gameData);
+      let locale = await require(`./locale/${humanInfo.language}.json`);
+      let slashReturn = await command.execute(client, interaction, config, util, master, pokemonLists, moveLists, locale, humanInfo, incidentLists, raidLists, questLists, gameData);
     } catch (error) {
       console.error(error);
       await interaction.reply({
@@ -234,11 +248,16 @@ client.on('interactionCreate', async interaction => {
           console.log('Api error:', error);
           autoCompleteCommands("en");
         } else {
-          let responseText = JSON.parse(response.text);
-          if (responseText.human.language) {
-            autoCompleteCommands(responseText.human.language);
+          var humanInfoAll = JSON.parse(response.text);
+          var humanInfo = humanInfoAll.human;
+          if (humanInfoAll.status != 'ok') {
+            console.log(`User: ${interaction.user.id} | Command: ${interaction.commandName} | Error: ${humanInfo}`);
+            return;
           } else {
-            autoCompleteCommands("en");
+            if (!humanInfo.language) {
+              humanInfo.language = config.defaultLanguage ? config.defaultLanguage : 'en';
+            }
+            autoCompleteCommands(humanInfo.language);
           }
         }
       }); //End of superagent
@@ -333,8 +352,7 @@ async function createLocales(client, config, languages) {
       let localOverride = require(`./locale/custom/local.json`);
       defaultJson = Object.assign(defaultJson, localOverride);
     }
-  }
-  catch(err){
+  } catch (err) {
     console.log(err);
   }
   await Promise.all(languages.map((locale) =>

@@ -22,6 +22,6 @@ module.exports = {
 
 	async execute(client, interaction, config, util, master, pokemonLists, moveLists, locale, humanInfo) {
 		await interaction.deferReply();
-		Profile.showAvailableProfiles(client, interaction, config, util, locale);
+		Profile.showAvailableProfiles(client, interaction, config, util, locale, humanInfo);
 	}, //End of execute()
 };

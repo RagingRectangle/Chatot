@@ -13,19 +13,19 @@ module.exports = {
 		.setNameLocalizations(localizations.infoCommand ? localizations.infoCommand : {})
 		.setDescription(defaults.infoDescription)
 		.setDescriptionLocalizations(localizations.infoDescription)
-		//.addSubcommand(subcommand =>
-		//	subcommand
-		//	.setName(defaults.pokemonName)
-		//	.setNameLocalizations(localizations.pokemonName)
-		//	.setDescription(defaults.pokemonDescription)
-		//	.setDescriptionLocalizations(localizations.pokemonDescription)
-		//	.addStringOption(option =>
-		//		option.setName(defaults.pokemonName)
-		//		.setNameLocalizations(localizations.pokemonName)
-		//		.setDescription(defaults.pokemonDescription)
-		//		.setDescriptionLocalizations(localizations.pokemonDescription)
-		//		.setRequired(true)
-		//		.setAutocomplete(true)))
+		.addSubcommand(subcommand =>
+			subcommand
+			.setName(defaults.pokemonName)
+			.setNameLocalizations(localizations.pokemonName)
+			.setDescription(defaults.pokemonDescription)
+			.setDescriptionLocalizations(localizations.pokemonDescription)
+			.addStringOption(option =>
+				option.setName(defaults.pokemonName)
+				.setNameLocalizations(localizations.pokemonName)
+				.setDescription(defaults.pokemonDescription)
+				.setDescriptionLocalizations(localizations.pokemonDescription)
+				.setRequired(true)
+				.setAutocomplete(true)))
 		.addSubcommand(subcommand =>
 			subcommand
 			.setName(defaults.infoMoveName)
@@ -44,7 +44,7 @@ module.exports = {
 	async execute(client, interaction, config, util, master, pokemonLists, moveLists, locale, humanInfo, incidentLists, raidLists, questLists, gameData) {
 		await interaction.deferReply();
 		if (interaction.options._subcommand == defaults.pokemonName) {
-			Info.pokemon(client, interaction, config, util, master, pokemonLists, moveLists, locale, gameData);
+			Info.pokemon(client, interaction, config, util, master, locale, gameData);
 		} else if (interaction.options._subcommand == defaults.infoMoveName) {
 			Info.move(client, interaction, config, util, master, pokemonLists, moveLists, locale, gameData);
 		}

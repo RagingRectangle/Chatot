@@ -12,6 +12,7 @@
       "database": "poracle"
     }
   },
+  "defaultLanguage": "en",
   "ignoreTemplates": [""],
   "pokemonCommand": "track",
   "areaCommand": "area",

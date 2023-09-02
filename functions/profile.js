@@ -7,7 +7,7 @@ const _ = require('lodash');
 const superagent = require('superagent');
 
 module.exports = {
-  showAvailableProfiles: async function showAvailableProfiles(client, interaction, config, util, locale) {
+  showAvailableProfiles: async function showAvailableProfiles(client, interaction, config, util, locale, humanInfo) {
     //Get profile list
     superagent
       .get(util.api.getProfiles.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
@@ -21,28 +21,14 @@ module.exports = {
           if (profileList.length == 0) {
             interaction.editReply(locale.profileNoneResponse).catch(console.error);
           } else {
-            getActiveProfile(profileList);
+            sendProfileChangeMessage(profileList);
           }
         }
       }); //End of superagent
 
-    async function getActiveProfile(profileList) {
-      superagent
-        .get(util.api.humanInfo.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
-        .set('X-Poracle-Secret', config.poracle.secret)
-        .end((error, response) => {
-          if (error) {
-            console.log('Api error:', error);
-          } else {
-            let humanInfo = JSON.parse(response.text);
-            let activeProfileNumber = humanInfo.human.current_profile_no;
-            sendProfileChangeMessage(profileList, activeProfileNumber);
-          }
-        }); //End of superagent
-    } //End of getActiveProfile()
-
-    async function sendProfileChangeMessage(profileList, activeProfileNumber) {
+    async function sendProfileChangeMessage(profileList) {
       try {
+        let activeProfileNumber = humanInfo.current_profile_no;
         var profileEmbed = new EmbedBuilder().setTitle('Available Profiles:');
         var profileDescription = [];
         var namesOfProfiles = [];

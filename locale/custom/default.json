@@ -130,6 +130,8 @@
   "removeAlertDescription": "Select tracking to remove",
   "removedAlert": "Custom alert deleted",
   "thirdMoveCost": "Third Move Cost",
+  "everything": "Everything",
+  "everythingIndividually": "Everything Individually",
   "pokemonCommand": "",
   "areaCommand": "",
   "locationCommand": "",

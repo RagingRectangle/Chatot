@@ -382,6 +382,7 @@ function createDescription(apiName, config, util, gameData, language, alert) {
       //Size
       if (alert.size != -1 && alert.max_size != 5) {
         let sizeName = (`${alert.size}-${alert.max_size}`).replace('-1', '?').replace(1, locale.sizeXxs).replace('2', locale.sizeXs).replace('3', locale.sizeM).replace('4', locale.sizeXl).replace('5', locale.sizeXxl);
+        filters.push(sizeName);
       }
       //Gender
       if (alert.gender == 1 || alert.gender == 2) {

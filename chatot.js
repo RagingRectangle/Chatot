@@ -30,7 +30,6 @@ var pokemonListBasic = [];
 var pokemonLists = {};
 var megaLists = {};
 var moveLists = {};
-var templateList = {};
 var templateLists = {};
 var incidentLists = {};
 var raidLists = {};
@@ -67,7 +66,6 @@ client.on('ready', async () => {
       if (!error && res.statusCode == 200) {
         master = body;
         gameData['questRewardTypes'] = master['questRewardTypes'];
-
         getLanguages(client, config);
       } else {
         console.log('Error updating data/locales:', error);
@@ -338,7 +336,7 @@ async function getLanguages(client, config) {
       let languages = body;
       createLocales(client, config, languages);
     } else {
-      console.log(err);
+      console.log(error);
     }
   });
 } //End of getLanguages()
@@ -417,7 +415,6 @@ async function createLocales(client, config, languages) {
   //Register Commands
   updateConfigRegisterCommands(client, config);
   //Update lists
-  createPokemonList();
   createIncidentLists();
   createMoveLists();
   createTemplateLists();
@@ -446,6 +443,14 @@ async function createPokemonList() {
       let locale = JSON.parse(fs.readFileSync(`./locale/${file}`));
       var localeMonList = {};
       var localeMegaList = {};
+      //Everything: 0~0
+      if (config.everythingFlagPermissions == 'allow-any' || config.everythingFlagPermissions == 'allow-and-ignore-individually'){
+        localeMonList[locale.everything ? locale.everything : 'Everything'] = '0_0';
+      }
+      //Everything Individually: 00~00
+      //if (config.everythingFlagPermissions == 'allow-any' || config.everythingFlagPermissions == 'allow-and-always-individually'){
+      //  localeMonList[locale.everythingIndividually ? locale.everythingIndividually : 'Everything Individually'] = '00_00';
+      //}
       for (const [dexForm, monData] of Object.entries(gameData.monsters)) {
         let monName = locale[monData.name] ? locale[monData.name] : monData.name;
         //Add base form
@@ -557,7 +562,7 @@ async function createIncidentLists() {
       if (!error && res.statusCode == 200) {
         createLocaleIncidents(body.characters);
       } else {
-        console.log('Error fetching current incident list:', err);
+        console.log('Error fetching current incident list:', error);
       }
     }); //End of request()
   } catch (err) {
@@ -687,6 +692,8 @@ async function updateConfigRegisterCommands(client, config) {
         config.everythingFlagPermissions = body.everythingFlagPermissions;
         //Register Slash Commands
         SlashRegistry.registerCommands(client, config);
+        //Update Pokemon lists
+        createPokemonList();
       }
     });
 } //End of updateConfigRegisterCommands()

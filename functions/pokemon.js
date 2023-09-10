@@ -53,6 +53,8 @@ module.exports = {
           filters.pvp_ranking_worst = pokemonOptions[17] * 1;
         }
       }
+      //Everything Individually
+      //else if (pokemonOptions[0] == '00' && pokemonOptions[1] == '00') {}
       //console.log(filters);
       superagent
         .post(util.api.addSpawnTracking.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
@@ -89,7 +91,7 @@ module.exports = {
         value: pokemonInfo[0]
       });
       //Other options
-      customFilters = {
+      var customFilters = {
         "min_iv": "",
         "max_iv": "",
         "min_atk": "",

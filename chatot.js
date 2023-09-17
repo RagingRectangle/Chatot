@@ -8,9 +8,12 @@ const client = new Client({
   intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildEmojisAndStickers, GatewayIntentBits.GuildMembers, GatewayIntentBits.GuildMessageReactions, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildScheduledEvents, GatewayIntentBits.DirectMessages],
   partials: [Partials.Message, Partials.Channel, Partials.Reaction],
 });
+const _ = require('lodash');
 const fs = require('fs');
 const fetch = require('node-fetch');
+const mysql = require('mysql2');
 const request = require('request');
+const schedule = require('node-schedule');
 const superagent = require('superagent');
 var config = require('./config.json');
 const SlashRegistry = require('./functions/slashRegistry.js');
@@ -34,6 +37,8 @@ var templateLists = {};
 var incidentLists = {};
 var raidLists = {};
 var questLists = {};
+var areaGyms = {};
+var gymIDs = {};
 var master = "";
 var gameData = "";
 
@@ -73,6 +78,16 @@ client.on('ready', async () => {
       }
     });
   } //End of updateMaster()
+
+  //Rocket and Area Gym Cron
+  try {
+    const cronJob = schedule.scheduleJob('rocketGymCron', '0 * * * *', function () {
+      createIncidentLists();
+      createAreaGymsLists();
+    });
+  } catch (err) {
+    console.log(err);
+  }
 }); //End of ready()
 
 
@@ -111,7 +126,7 @@ client.on('interactionCreate', async interaction => {
   }
   //Add raid
   else if (interactionID.startsWith('chatot~raid~verify~')) {
-    Raid.addRaid(client, interaction, config, util, interactionID.replace('chatot~raid~verify~', ''));
+    Raid.addRaid(client, interaction, config, util, areaGyms, interactionID.replace('chatot~raid~verify~', ''));
   }
   //Add quest
   else if (interactionID.startsWith('chatot~quest~verify')) {
@@ -255,61 +270,103 @@ client.on('interactionCreate', async interaction => {
             if (!humanInfo.language) {
               humanInfo.language = config.defaultLanguage ? config.defaultLanguage : 'en';
             }
-            autoCompleteCommands(humanInfo.language);
+            autoCompleteCommands(humanInfo);
           }
         }
       }); //End of superagent
 
-    async function autoCompleteCommands(language) {
+    async function autoCompleteCommands(humanInfo) {
       try {
         //Remove
         if (optionName == defaults.removeAlertName && interaction.commandName == config.removeCommand) {
-          Remove.autoComplete(client, interaction, config, util, gameData, language);
+          Remove.autoComplete(client, interaction, config, util, gameData, humanInfo.language, gymIDs);
         }
         //Pokemon
         if (optionName == defaults.pokemonName) {
-          let filteredList = Object.keys(pokemonLists[language]).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
+          var userPokeList = {};
+          //Add everything for Pokemon/nests
+          if (interaction.commandName == config.pokemonCommand || interaction.commandName == config.nestCommand) {
+            let locale = await require(`./locale/${humanInfo.language}.json`);
+            //Everything: 0~0
+            if (config.everythingFlagPermissions == 'allow-any' || config.everythingFlagPermissions == 'allow-and-ignore-individually') {
+              userPokeList[locale.everything ? locale.everything : 'Everything'] = '0_0';
+            }
+            //Everything Individually: 00~00
+            //if (config.everythingFlagPermissions == 'allow-any' || config.everythingFlagPermissions == 'allow-and-always-individually'){
+            //  userPokeList[locale.everythingIndividually ? locale.everythingIndividually : 'Everything Individually'] = '00_00';
+            //}
+          } //End of everything
+          userPokeList = _.merge(userPokeList, pokemonLists[humanInfo.language]);
+          let filteredList = Object.keys(userPokeList).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
           await interaction.respond(
             filteredList.map(choice => ({
               name: choice,
-              value: `${choice}~${pokemonLists[language][choice]}`
+              value: `${choice}~${userPokeList[choice]}`
             }))
           ).catch(console.error);
         }
         //Move
         else if (optionName == defaults.infoMoveName && interaction.options['_subcommand'] == defaults.infoMoveName && interaction.commandName == config.infoCommand) {
-          let filteredList = Object.keys(moveLists[language]).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
+          let filteredList = Object.keys(moveLists[humanInfo.language]).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
           await interaction.respond(
             filteredList.map(choice => ({
               name: choice,
-              value: `${moveLists[language][choice]}~${language}`
+              value: `${moveLists[humanInfo.language][choice]}~${humanInfo.language}`
             }))
           ).catch(console.error);
         }
         //Incident
         else if (optionName == defaults.incidentTypeName && interaction.commandName == config.incidentCommand) {
-          let filteredList = Object.keys(incidentLists[language]).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
+          let filteredList = Object.keys(incidentLists[humanInfo.language]).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
           sendAutoResponse(filteredList);
         }
         //Raid
         else if (optionName == defaults.raidTypeName && interaction.commandName == config.raidCommand) {
-          let filteredList = Object.keys(raidLists[language]).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
+          let filteredList = Object.keys(raidLists[humanInfo.language]).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
           sendAutoResponse(filteredList);
         }
         //Quest
         else if (optionName == defaults.questTypeName && interaction.commandName == config.questCommand) {
-          let filteredList = Object.keys(questLists[language]).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
-          //console.log(filteredList)
+          let filteredList = Object.keys(questLists[humanInfo.language]).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
           sendAutoResponse(filteredList);
         }
-        //Templates
+        //Template
         else if (optionName == defaults.templateName) {
           let templateType = interaction.commandName.replace(config.pokemonCommand, 'monster').replace(config.raidCommand, 'raid').replace(config.incidentCommand, 'invasion').replace(config.questCommand, 'quest').replace(config.lureCommand, 'lure');
-          if (templateLists[templateType][language]) {
-            let filteredList = templateLists[templateType][language].filter(choice => choice.toString().toLowerCase().includes(focusedValue) && !config.ignoreTemplates.includes(choice)).slice(0, 25);
+          if (templateLists[templateType][humanInfo.language]) {
+            let filteredList = templateLists[templateType][humanInfo.language].filter(choice => choice.toString().toLowerCase().includes(focusedValue) && !config.ignoreTemplates.includes(choice)).slice(0, 25);
             sendAutoResponse(filteredList);
           }
         }
+        //Gym
+        else if (optionName == defaults.gymName) {
+          if (areaGyms == {}) {
+            sendAutoResponse(".");
+          } else {
+            try {
+              const data = await fetch(
+                util.api.availableAreas.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id), {
+                  method: 'GET',
+                  headers: {
+                    'X-Poracle-Secret': config.poracle.secret,
+                    accept: 'application/json',
+                  },
+                }
+              );
+              let apiResponse = await data.json();
+              let availableAreas = apiResponse.areas;
+              var allGyms = [];
+              for (var a in availableAreas) {
+                let thisAreaGyms = areaGyms[availableAreas[a]['name']];
+                allGyms = _.merge(allGyms, thisAreaGyms);
+              }
+              let filteredList = Object.keys(allGyms).filter(choice => choice.toLowerCase().includes(focusedValue)).slice(0, 25);
+              sendAutoResponse(filteredList);
+            } catch (err) {
+              console.log(err);
+            }
+          }
+        } //End of Gym
       } catch (err) {
         console.log(err);
       }
@@ -443,14 +500,6 @@ async function createPokemonList() {
       let locale = JSON.parse(fs.readFileSync(`./locale/${file}`));
       var localeMonList = {};
       var localeMegaList = {};
-      //Everything: 0~0
-      if (config.everythingFlagPermissions == 'allow-any' || config.everythingFlagPermissions == 'allow-and-ignore-individually'){
-        localeMonList[locale.everything ? locale.everything : 'Everything'] = '0_0';
-      }
-      //Everything Individually: 00~00
-      //if (config.everythingFlagPermissions == 'allow-any' || config.everythingFlagPermissions == 'allow-and-always-individually'){
-      //  localeMonList[locale.everythingIndividually ? locale.everythingIndividually : 'Everything Individually'] = '00_00';
-      //}
       for (const [dexForm, monData] of Object.entries(gameData.monsters)) {
         let monName = locale[monData.name] ? locale[monData.name] : monData.name;
         //Add base form
@@ -487,6 +536,7 @@ async function createPokemonList() {
     //Other lists
     createRaidLists();
     createQuestLists();
+    createAreaGymsLists();
   } catch (err) {
     console.log(err);
   }
@@ -552,6 +602,82 @@ async function createQuestLists() {
     console.log(err);
   }
 } //End of createQuestLists()
+
+
+async function createAreaGymsLists() {
+  if (!config.golbat.database.host) {
+    console.log("Config missing Golbat database info, skipping gym filter options.");
+    return;
+  }
+  try {
+    const data = await fetch(
+      util.api.poracleGeofences.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port), {
+        method: 'GET',
+        headers: {
+          'X-Poracle-Secret': config.poracle.secret,
+          accept: 'application/json',
+        },
+      }
+    );
+    let geofenceResponse = await data.json();
+    if (geofenceResponse.status == 'ok' && geofenceResponse.geofence.length > 0) {
+      getAreaGyms(geofenceResponse.geofence);
+    } else {
+      console.log("Error getting area geofences from Poracle.");
+    }
+  } catch (err) {
+    console.log('Error fetching current incident list:', err);
+  }
+
+  async function getAreaGyms(fences) {
+    try {
+      var areaNameList = [];
+      var queryList = [];
+      for (var f = 0; f < fences.length; f++) {
+        if (fences[f]['displayInMatches'] == false || fences[f]['userSelectable'] == false) {
+          continue;
+        }
+        let areaName = fences[f]['name'];
+        let poraclePath = fences[f]['path'];
+        var areaCoords = [];
+        for (var p in poraclePath) {
+          areaCoords.push(`${poraclePath[p][0]} ${poraclePath[p][1]}`);
+        } //End of p loop
+        areaNameList.push(areaName);
+        queryList.push(util.api.golbatGyms.replace('{{area}}', areaCoords.join(', ')));
+      } //End of f loop
+      let allGyms = await runGymQuery(queryList.join(' '));
+      for (var a in allGyms) {
+        var gymList = {};
+        for (var g in allGyms[a]) {
+          gymList[`${allGyms[a][g]['name']} (${areaNameList[a]})`] = allGyms[a][g]['id'];
+          gymIDs[allGyms[a][g]['id']] = `${allGyms[a][g]['name']} (${areaNameList[a]})`;
+        } //End of g loop
+        areaGyms[areaNameList[a]] = gymList;
+      } //End of a loop
+      console.log("Area gyms cached");
+    } catch (err) {
+      console.log(err);
+    }
+  } //End of getAreaGyms()
+
+  async function runGymQuery(query) {
+    var dbConfig = config.golbat.database;
+    dbConfig.multipleStatements = true;
+    let golbatConnection = mysql.createConnection(dbConfig);
+    return new Promise((resolve, reject) => {
+      golbatConnection.query(query, (error, results) => {
+        if (error) {
+          golbatConnection.end();
+          console.log(error)
+          return resolve(`ERROR`);
+        }
+        golbatConnection.end();
+        return resolve(results);
+      });
+    });
+  } //End of runGymQuery()
+} //End of createAreaGymsLists()
 
 
 async function createIncidentLists() {

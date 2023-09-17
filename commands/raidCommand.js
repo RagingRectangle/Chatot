@@ -20,6 +20,13 @@ module.exports = {
 			.setDescriptionLocalizations(localizations.raidTypeDescription)
 			.setRequired(true)
 			.setAutocomplete(true))
+		//Gym
+		.addStringOption(option =>
+			option.setName(defaults.gymName)
+			.setNameLocalizations(localizations.gymName)
+			.setDescription(defaults.gymDescription)
+			.setDescriptionLocalizations(localizations.gymDescription)
+			.setAutocomplete(true))
 		//Team
 		.addStringOption(option =>
 			option.setName(defaults.raidTeamName)

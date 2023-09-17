@@ -12,6 +12,15 @@
       "database": "poracle"
     }
   },
+  "golbat": {
+    "database": {
+      "host": "",
+      "port": 3306,
+      "user": "",
+      "password": "",
+      "database": "golbat"
+    }
+  },
   "defaultLanguage": "en",
   "ignoreTemplates": [""],
   "pokemonCommand": "track",
@@ -24,5 +33,5 @@
   "lureCommand": "lure",
   "removeCommand": "remove",
   "infoCommand": "info",
-   "nestCommand": "nest"
+  "nestCommand": "nest"
 }

@@ -8,8 +8,8 @@ const superagent = require('superagent');
 const defaults = require('../locale/custom/default.json');
 
 module.exports = {
-  addRaid: async function addRaid(client, interaction, config, util, raidInteractionID) {
-    //${level}~${pokemonID}~${pokemonForm}~${team}~${distance}~${clean}~${template}
+  addRaid: async function addRaid(client, interaction, config, util, areaGyms, raidInteractionID) {
+    //${level}~${pokemonID}~${pokemonForm}~${team}~${distance}~${clean}~${template}~${gymInfo}
     let raidOptions = raidInteractionID.split('~');
     try {
       var filters = {
@@ -26,6 +26,13 @@ module.exports = {
         "evolution": 9000,
         "gym_id": null
       };
+      //Gym
+      if (raidOptions[7]){
+        let gymSplit = raidOptions[7].replaceAll(')','').split(' (');
+        let areaName = gymSplit[gymSplit.length - 1];
+        let gymID = areaGyms[areaName][raidOptions[7]];
+        filters.gym_id = gymID;
+      }
       superagent
         .post(util.api.addRaid.replace('{{host}}', config.poracle.host).replace('{{port}}', config.poracle.port).replace('{{id}}', interaction.user.id))
         .send([filters])
@@ -58,11 +65,20 @@ module.exports = {
         value: options[0]['value']
       });
       //Other options
+      var gymInfo = '';
       var distance = 0;
       var team = 4;
       var template = config.defaultTemplateName;
       var clean = '';
       for (var i = 1; i < options.length; i++) {
+        //Gym
+        if (options[i]['name'] == defaults.gymName) {
+          gymInfo = options[i]['value'];
+          raidEmbed.addFields({
+            name: locale.gymName,
+            value: gymInfo
+          });
+        }
         //Team
         if (options[i]['name'] == defaults.raidTeamName) {
           team = options[i]['value'];
@@ -96,7 +112,7 @@ module.exports = {
           });
         }
       } //End of i loop
-      let customID = `chatot~raid~verify~${raidData}~${team}~${distance}~${clean}~${template}`;
+      let customID = `chatot~raid~verify~${raidData}~${team}~${distance}~${clean}~${template}~${gymInfo}`;
       let raidComponents = new ActionRowBuilder().addComponents(new ButtonBuilder().setLabel(locale.buttonVerify).setCustomId(customID).setStyle(ButtonStyle.Success)).addComponents(new ButtonBuilder().setLabel(locale.buttonCancel).setCustomId(`chatot~delete`).setStyle(ButtonStyle.Danger));
       await interaction.editReply({
         embeds: [raidEmbed],

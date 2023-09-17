@@ -82,7 +82,7 @@ async function fetchAndCache(config, interaction, apiName) {
 }
 
 
-async function autoComplete(client, interaction, config, util, gameData, language) {
+async function autoComplete(client, interaction, config, util, gameData, language, gymIDs) {
   try {
     const start = Date.now();
     let focusedValue = await interaction.options.getFocused();
@@ -100,7 +100,8 @@ async function autoComplete(client, interaction, config, util, gameData, languag
       config,
       util,
       gameData,
-      language
+      language,
+      gymIDs
     );
     //console.log(`AutoComplete ${apiName} took ${Date.now() - start2}ms to create list`);
     await interaction
@@ -119,7 +120,7 @@ async function autoComplete(client, interaction, config, util, gameData, languag
 } //End of autoComplete()
 
 
-function createTrackingList(userTracks, focusedValue, apiName, config, util, gameData, language) {
+function createTrackingList(userTracks, focusedValue, apiName, config, util, gameData, language, gymIDs) {
   if (!userTracks) {
     console.log('Error: userTracks not found for removal.');
     return;
@@ -134,7 +135,7 @@ function createTrackingList(userTracks, focusedValue, apiName, config, util, gam
     };
     for (let i = 0; i < userTracks.length; i++) {
       if (trackingList.length === 25) break;
-      let tracking = createDescription(apiName, config, util, gameData, language, userTracks[i]);
+      let tracking = createDescription(apiName, config, util, gameData, language, userTracks[i], gymIDs);
       uidList[tracking] = userTracks[i]['uid'];
       handleAdd(tracking);
     } //End of i loop
@@ -148,7 +149,7 @@ function createTrackingList(userTracks, focusedValue, apiName, config, util, gam
 } //End of createTrackingList()
 
 
-function createDescription(apiName, config, util, gameData, language, alert) {
+function createDescription(apiName, config, util, gameData, language, alert, gymIDs) {
   try {
     let locale = require(`../locale/${language}.json`);
     var alertEntry = '';
@@ -340,7 +341,8 @@ function createDescription(apiName, config, util, gameData, language, alert) {
       }
       //Gym
       if (alert.gym_id != null) {
-        filters.push(`@${alert.gym_id}`);
+        let gymName = gymIDs[alert.gym_id] ? gymIDs[alert.gym_id] : alert.gym_id;
+        filters.push(`@${gymName}`);
       }
       alertEntry = filters.join(' | ').slice(0, 100);
       return alertEntry;

@@ -132,6 +132,8 @@
   "thirdMoveCost": "Third Move Cost",
   "everything": "Everything",
   "everythingIndividually": "Everything Individually",
+  "gymName": "gym",
+  "gymDescription": "Enter optional gym name",
   "pokemonCommand": "",
   "areaCommand": "",
   "locationCommand": "",

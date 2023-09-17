@@ -19,6 +19,8 @@
       "gameDataAll": "http://{{host}}:{{port}}/api/masterdata/all",
       "gameDataTypes": "http://{{host}}:{{port}}/api/masterdata/types",
       "gameDataUtilData": "http://{{host}}:{{port}}/api/masterdata/utilData",
+      "poracleGeofences": "http://{{host}}:{{port}}/api/geofence/all",
+      "golbatGyms": "select id, name from gym where name is not null and ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({{area}}))'), point(lat, lon));",
       "rocketApi": "https://rocket.malte.im/api/characters"
    },
    "raidLevels": {

@@ -26,6 +26,7 @@ Join the Discord server for any help and to keep up with updates: https://discor
 - Full customization of Discord command names/text
 - Localized user translations based on Poracle/Discord languages
 - Only for user alerts (Channels not supported)
+- Option to add Golbat db to add raid tracking at specific gyms 
 
 
 ## Requirements
@@ -41,13 +42,19 @@ npm install
 ```
 
 ## Config Setup
-- **token:** Discord token used for Poracle bot.
-Poracle:
+**Token:** Discord token used for Poracle bot.
+
+**Poracle:**
  - **secret:** apiSecret
  - **host:** IP address
  - **port:** Port
  - **database:** Poracle database info
 
+**Golbat (optional):**
+ - **database:** Golbat database info
+
+**Other:**
+- **defaultLanguage:** Set default language.
 - **ignoreTemplates:** List names of any templates you don't want to appear as options.
 - **xxxCommand:** Slash command names. Use only lowercase. Leave blank if you don't want to include it.
 
